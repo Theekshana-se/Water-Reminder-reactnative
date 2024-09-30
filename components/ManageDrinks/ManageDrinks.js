@@ -1,24 +1,29 @@
-import { useEffect, useState, useRef } from "react";
-import { StyleSheet, Text, View, Image, Animated, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, FlatList } from "react-native";
 import { ACTIVITY_KEY, WEIGHT_KEY } from "../../constants/storage";
-import { GlobalStyles } from "../../constants/styles";
-import { getItem } from "../../storage/database";
-import { calcDailyGoal, calculateDrinkProgress } from "../../utils/Drinks";
-import Button from "../Buttons/Button";
+import { calcDailyGoal } from "../../utils/Drinks";
 import UIModal from "../UI/UIModal";
-import { useNavigation } from "@react-navigation/native"; // For navigation between screens
+import { useNavigation } from "@react-navigation/native";
+import { Feather } from '@expo/vector-icons';
+import ImprovedWaterGlass from './ImprovedWaterGlass';
 
 const ManageDrinks = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [drinkProgress, setDrinkProgress] = useState(0);
   const [selectedQuantity, setSelectedQuantity] = useState(0);
-  const [selectedBeverage, setSelectedBeverage] = useState('Water'); // Default to Water
-  const [beverageOptions, setBeverageOptions] = useState(['Water', 'Coffee']); // Initial options
+  const [selectedBeverage, setSelectedBeverage] = useState('Coffee');
+  const [beverageOptions, setBeverageOptions] = useState(['Coffee', 'Yogurt', 'Tea']);
   const [dailyGoal, setDailyGoal] = useState();
-  
-  // Animated value for the water height
-  const animatedHeight = useRef(new Animated.Value(0)).current;
-  const navigation = useNavigation(); // Initialize navigation hook
+  const navigation = useNavigation();
+
+  const quantities = [
+    { id: 1, value: 150, text: "150ml" },
+    { id: 2, value: 200, text: "200ml" },
+    { id: 3, value: 250, text: "250ml" },
+    { id: 4, value: 300, text: "300ml" },
+    { id: 5, value: 350, text: "350ml" },
+    { id: 6, value: 0, text: "Add more" },
+  ];
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -41,19 +46,10 @@ const ManageDrinks = () => {
   const confirmModalHandler = async (selectedQuantity) => {
     if (selectedQuantity) {
       setModalVisible(false);
-      let [height, progress] = await calculateDrinkProgress(selectedQuantity);
-      if (progress >= 100) {
-        progress = 100;
-      }
-
-      // Animate the water fill inside the glass
-      Animated.timing(animatedHeight, {
-        toValue: height, // height value from calculateDrinkProgress
-        duration: 1500,  // duration of the animation
-        useNativeDriver: false, // We're animating height, so no native driver here
-      }).start();
-
-      setDrinkProgress(progress);
+      // Calculate the new total progress based on 2000ml
+      const newProgress = drinkProgress + (selectedQuantity / 2000) * 100; // Normalize based on the maximum of 2000ml
+      const clampedProgress = Math.min(newProgress, 100); // Clamp the value to 100%
+      setDrinkProgress(clampedProgress); // Update the drink progress state
     }
   };
 
@@ -63,10 +59,15 @@ const ManageDrinks = () => {
   };
 
   const addBeverageHandler = () => {
-    // Navigate to the Add Beverage screen and pass a callback to update the beverages
     navigation.navigate('AddBeverageScreen', {
       addBeverage: (newBeverage) => {
-        setBeverageOptions([...beverageOptions, newBeverage]);
+        setBeverageOptions((prevBeverages) => {
+          if (prevBeverages.length >= 3) {
+            return [...prevBeverages.slice(1), newBeverage];
+          } else {
+            return [...prevBeverages, newBeverage];
+          }
+        });
       }
     });
   };
@@ -75,132 +76,92 @@ const ManageDrinks = () => {
     setSelectedBeverage(beverage);
   };
 
+  const renderQuantityItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.quantityButton}
+      onPress={() => selectQuantityHandler(item.value)}
+    >
+      <Text style={styles.quantityButtonText}>{item.text}</Text>
+    </TouchableOpacity>
+  );
+
+  const resetWaterProgress = () => {
+    setDrinkProgress(0);
+  };
+
   return (
-    <>
-      <View style={styles.container}>
-        {/* Glass Image with Water Overlay */}
-        <View style={styles.glassContainer}>
-          <Image 
-            source={require('../../assets/glass.png')} 
-            style={styles.glassImage}
-            resizeMode="contain"
-          />
-          
-          {/* Water fill animation */}
-          <Animated.View style={[styles.water, { height: animatedHeight }]}></Animated.View>
-          
-          {/* Percentage text */}
-          <Text style={styles.waterText}>{drinkProgress} %</Text>
-        </View>
-
-        {/* Beverage Selection */}
-        <Text style={styles.beveragePrompt}>How much water do you want to drink at this time?</Text>
-        <View style={styles.beverageSelection}>
-          {beverageOptions.map((beverage, index) => (
-            <TouchableOpacity 
-              key={index}
-              style={styles.beverageButton}
-              onPress={() => selectBeverageHandler(beverage)}
-            >
-              <Image 
-                source={
-                  beverage === 'Water' 
-                    ? require('../../assets/drinks/big-cup-50ml.png')
-                    : beverage === 'Coffee'
-                    ? require('../../assets/drinks/big-cup-50ml.png')
-                    : require('../../assets/drinks/big-cup-50ml.png') // Default beverage icon for new ones
-                }
-                style={styles.beverageIcon}
-              />
-              <Text style={styles.beverageText}>{beverage}</Text>
-            </TouchableOpacity>
-          ))}
-          <TouchableOpacity 
-            style={styles.beverageButton}
-            onPress={addBeverageHandler}
-          >
-            <Image 
-              source={require('../../assets/beverages/add-button.png')} // Add beverage icon
-              style={styles.beverageIcon}
-            />
-            <Text style={styles.beverageText}>+ Add Beverage</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+    <View style={styles.container}>
+      <ImprovedWaterGlass progress={drinkProgress} />
+      <Text style={styles.beveragePrompt}>How much water do you want to drink at this time?</Text>
       
-      <View style={styles.center}>
-        <Button
-          icon="add"
-          size={22}
-          buttonStyles={styles.button}
-          color={GlobalStyles.colors.white}
-          onPress={openModalHandler}
+      <View style={styles.beverageSelection}>
+        {beverageOptions.map((beverage, index) => (
+          <TouchableOpacity 
+            key={index}
+            style={styles.beverageButton}
+            onPress={() => selectBeverageHandler(beverage)}
+          >
+            <View style={[styles.beverageIcon, selectedBeverage === beverage && styles.selectedBeverageIcon]}>
+              <Text style={styles.beverageEmoji}>
+                {beverage === 'Coffee' ? '☕' : beverage === 'Yogurt' ? '🥛' : '🍵'}
+              </Text>
+            </View>
+            <Text style={styles.beverageText}>{beverage}</Text>
+          </TouchableOpacity>
+        ))}
+        <TouchableOpacity 
+          style={styles.beverageButton}
+          onPress={addBeverageHandler}
         >
-          <Text style={styles.buttonText}>Drink</Text>
-        </Button>
+          <View style={styles.addBeverageIcon}>
+            <Feather name="plus" size={24} color="white" />
+          </View>
+          <Text style={styles.beverageText}>Add Beverage</Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.modalContainer}>
-        <UIModal
-          isVisible={isModalVisible}
-          onSelect={selectQuantityHandler}
-          onClose={closeModalHandler}
-          onConfirm={confirmModalHandler}
+      <View style={styles.quantityContainer}>
+        <FlatList
+          data={quantities}
+          renderItem={renderQuantityItem}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
         />
       </View>
-    </>
+
+      <TouchableOpacity style={styles.resetButton} onPress={resetWaterProgress}>
+        <Feather name="refresh-cw" size={24} color="white" />
+      </TouchableOpacity>
+
+      <UIModal
+        isVisible={isModalVisible}
+        onSelect={selectQuantityHandler}
+        onClose={closeModalHandler}
+        onConfirm={confirmModalHandler}
+      />
+    </View>
   );
 };
-
-export default ManageDrinks;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-  },
-  glassContainer: {
-    position: "relative",
-    width: 100,
-    height: 250,
-    marginTop: -30, 
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  glassImage: {
-    width: "100%",
-    height: "100%",
-    position: "absolute",
-  },
-  water: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    backgroundColor: GlobalStyles.colors.primary300,
-    borderBottomLeftRadius: 10, 
-    borderBottomRightRadius: 10,
-    overflow: "hidden",
-  },
-  waterText: {
-    position: "absolute",
-    bottom: 10,
-    left: "35%",
-    fontSize: 20,
-    color: GlobalStyles.colors.primary700,
-    fontWeight: "bold",
+    backgroundColor: '#f5f5f5',
   },
   beveragePrompt: {
     fontSize: 16,
     color: 'black',
     marginTop: 20,
+    marginBottom: 10,
     textAlign: "left",
   },
   beverageSelection: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "80%",
-    marginTop: 20,
+    width: "100%",
+    marginTop: 10,
   },
   beverageButton: {
     alignItems: "center",
@@ -208,34 +169,58 @@ const styles = StyleSheet.create({
   beverageIcon: {
     width: 50,
     height: 50,
+    borderRadius: 25,
+    backgroundColor: '#E0E0E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectedBeverageIcon: {
+    backgroundColor: '#2196F3',
+  },
+  beverageEmoji: {
+    fontSize: 24,
+  },
+  addBeverageIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#2196F3',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   beverageText: {
     fontSize: 14,
-    color: GlobalStyles.colors.primary700,
+    color: 'black',
+    marginTop: 5,
   },
-  center: {
-    marginTop: "auto",
-    marginBottom: "auto",
-  },
-  button: {
-    width: 250,
-    height: 50,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+  quantityContainer: {
     marginTop: 20,
-    backgroundColor: GlobalStyles.colors.primary400,
-    borderRadius: 25,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    elevation: 4,
+    width: '90%',
   },
-  buttonText: {
-    color: GlobalStyles.colors.white,
-    fontWeight: "bold",
-    fontSize: 20,
-    marginLeft: 4,
+  quantityButton: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    borderRadius: 25,
+    margin: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  quantityButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  resetButton: {
+    position: 'absolute',
+    top: 20, // Move the button to the top
+    right: 20, // Keep it aligned to the right
+    backgroundColor: '#2196F3',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
+
+export default ManageDrinks;

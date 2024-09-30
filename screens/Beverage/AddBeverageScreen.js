@@ -10,15 +10,15 @@ const AddBeverageScreen = ({ route }) => {
   const { addBeverage } = route.params; // Callback to update the beverage list
 
   const beverageOptions = [
-    { name: 'Water', image: require('../../assets/drinks/cup-150ml.png') },
-    { name: 'Tea', image: require('../../assets/drinks/cup-150ml.png') },
-    { name: 'Orange Juice', image: require('../../assets/drinks/cup-150ml.png') },
-    { name: 'Red Wine', image: require('../../assets/drinks/cup-150ml.png') },
-    { name: 'Coffee', image: require('../../assets/drinks/cup-150ml.png') },
-    { name: 'Milk', image: require('../../assets/drinks/cup-150ml.png') },
-    { name: 'Soda', image: require('../../assets/drinks/cup-150ml.png') },
-    { name: 'Yogurt', image: require('../../assets/drinks/cup-150ml.png') },
-  ];
+    { name: 'Water', emoji: '💧' },
+    { name: 'Tea', emoji: '🍵' },
+    { name: 'Orange Juice', emoji: '🍊' },
+    { name: 'Red Wine', emoji: '🍷' },
+    { name: 'Coffee', emoji: '☕' },
+    { name: 'Milk', emoji: '🥛' },
+    { name: 'Soda', emoji: '🥤' },
+    { name: 'Yogurt', emoji: '🍶' },
+];
 
   const handleSave = () => {
     if (selectedBeverage && hydrationLevel) {
@@ -35,20 +35,20 @@ const AddBeverageScreen = ({ route }) => {
 
       <Text style={styles.subTitle}>Enter Beverage Type</Text>
       <View style={styles.beverageGrid}>
-        {beverageOptions.map((beverage, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.beverageItem,
-              selectedBeverage === beverage.name && styles.selectedBeverage,
-            ]}
-            onPress={() => setSelectedBeverage(beverage.name)}
-          >
-            <Image source={beverage.image} style={styles.beverageImage} />
-            <Text style={styles.beverageText}>{beverage.name}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+  {beverageOptions.map((beverage, index) => (
+    <TouchableOpacity
+      key={index}
+      style={[
+        styles.beverageItem,
+        selectedBeverage === beverage.name && styles.selectedBeverage,
+      ]}
+      onPress={() => setSelectedBeverage(beverage.name)}
+    >
+      <Text style={styles.beverageEmoji}>{beverage.emoji}</Text>
+      <Text style={styles.beverageText}>{beverage.name}</Text>
+    </TouchableOpacity>
+  ))}
+</View>
 
       <Text style={styles.subTitle}>Enter Hydration Level</Text>
       <TextInput
