@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-n
 import { fetchUserWakeUpTime, fetchUserBedtime } from '../../lib/appwrite'; // Import Appwrite functions
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
+import * as TaskManager from 'expo-task-manager';
+import * as BackgroundFetch from 'expo-background-fetch';
 
 // Configure notification behavior
 Notifications.setNotificationHandler({
@@ -13,26 +15,49 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// Array of messages to send as notifications
+const messages = [
+  "It's time to drink water! 💧",
+  "Stay hydrated! Grab a glass of water.",
+  "Don't forget to drink water! 🌊",
+  "Water is life! Take a sip now.",
+  "Feeling thirsty? Drink some water! 💦",
+];
+
+// Randomly select a message from the messages array
+const getRandomMessage = () => {
+  const randomIndex = Math.floor(Math.random() * messages.length);
+  return messages[randomIndex];
+};
+
+// Define the background task for notifications
+TaskManager.defineTask('BACKGROUND_NOTIFICATION_TASK', async () => {
+  try {
+    // Schedule a random notification
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Drink Water Reminder 💧',
+        body: getRandomMessage(),
+        sound: true,
+      },
+      trigger: {
+        seconds: 0, // Trigger immediately in the background
+      },
+    });
+
+    // Return that new data was fetched
+    return BackgroundFetch.BackgroundFetchResult.NewData;
+  } catch (error) {
+    console.error('Error in background task:', error);
+    return BackgroundFetch.BackgroundFetchResult.Failed;
+  }
+});
+
 const NotificationScreen = () => {
   const [wakeUpTime, setWakeUpTime] = useState('Loading...');
   const [bedtime, setBedtime] = useState('Loading...');
   const [interval, setInterval] = useState(null);
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
-
-  // Array of messages to send as notifications
-  const messages = [
-    "It's time to drink water! 💧",
-    "Stay hydrated! Grab a glass of water.",
-    "Don't forget to drink water! 🌊",
-    "Water is life! Take a sip now.",
-    "Feeling thirsty? Drink some water! 💦"
-  ];
-
-  // Randomly select a message from the messages array
-  const getRandomMessage = () => {
-    const randomIndex = Math.floor(Math.random() * messages.length);
-    return messages[randomIndex];
-  };
 
   useEffect(() => {
     const loadTimes = async () => {
@@ -88,10 +113,36 @@ const NotificationScreen = () => {
         },
         trigger: {
           seconds: interval * 60, // Convert interval to seconds
-          repeats: true,
+          repeats: true, // Repeat this notification at the specified interval
         },
       });
       Alert.alert('Notification scheduled', `Every ${interval} minutes`);
+
+      // Register background fetch with the selected interval
+      registerBackgroundFetch(interval);
+    }
+  };
+
+  // Register the background fetch task
+  const registerBackgroundFetch = async (interval) => {
+    try {
+      const status = await BackgroundFetch.getStatusAsync();
+      console.log('BackgroundFetch status:', status);
+
+      if (status !== BackgroundFetch.Status.Available) {
+        console.log('Background fetch is not available.');
+        return;
+      }
+
+      await BackgroundFetch.registerTaskAsync('BACKGROUND_NOTIFICATION_TASK', {
+        minimumInterval: interval * 60, // Adjust this based on selected interval in seconds
+        stopOnTerminate: false, // Android only
+        startOnBoot: true, // Android only
+      });
+
+      console.log('Background fetch registered');
+    } catch (error) {
+      console.error('Error registering background fetch:', error);
     }
   };
 
@@ -102,6 +153,7 @@ const NotificationScreen = () => {
       Alert.alert('Notifications Enabled', 'You will receive notifications at the selected interval.');
     } else {
       Notifications.cancelAllScheduledNotificationsAsync(); // Cancel any scheduled notifications
+      BackgroundFetch.unregisterTaskAsync('BACKGROUND_NOTIFICATION_TASK'); // Unregister background fetch task
       Alert.alert('Notifications Disabled', 'Notifications have been turned off.');
     }
   };
