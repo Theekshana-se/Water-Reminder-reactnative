@@ -7,10 +7,22 @@ import { View, Text, StyleSheet } from "react-native";
 import Home from "../screens/Home/Home";
 import History from "../screens/History/History";
 import Settings from "../screens/Settings/Settings";
-import Profile from "../screens/Profile/Profile"; // New screen for Profile
+import Profile from "../screens/Profile/ProfileScreen"; // New screen for Profile
 import Location from "../screens/Location/Location"; // New screen for Location
 import { GlobalStyles } from "../constants/styles";
 import AddBeverageScreen from '../screens/Beverage/AddBeverageScreen';
+import Intro from '../screens/Intro/Intro';
+import Registration from '../screens/Intro/Register/Register';
+import Login from '../screens/Intro/Login/login';
+import Age from '../screens/Intro/Age/age'
+import ActivityLevelScreen from "../screens/Intro/ActivityLevel/ActivityLevelScreen";
+import WaterConsumptionScreen from "../screens/Intro/WaterConsumptionScreen/WaterConsumptionScreen"
+import ProfileScreen from "../screens/Profile/ProfileScreen";
+import EditProfile from "../screens/Profile/EditProfileScreen";
+import TimeSelection from "../screens/Intro/Time/TimeSelection";
+import NotificationScreen from "../screens/NotificationScreen/NotificationScreen"
+
+
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -64,7 +76,7 @@ function HomeOverview() {
       <BottomTab.Screen name="Location" component={Location} />
       <BottomTab.Screen
         name="Alarm"
-        component={History}
+        component={NotificationScreen}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <View style={styles.floatingIcon}>
@@ -74,7 +86,7 @@ function HomeOverview() {
         }}
       />
       <BottomTab.Screen name="Settings" component={Settings} />
-      <BottomTab.Screen name="Profile" component={Profile} />
+      <BottomTab.Screen name="Profile" component={ProfileScreen} />
     </BottomTab.Navigator>
   );
 }
@@ -107,8 +119,21 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Registration" component={Registration} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Intro" component={Intro} />
+      <Stack.Screen name="Age" component={Age} />
+      <Stack.Screen name="ActivityLevelScreen" component={ActivityLevelScreen} />
+      <Stack.Screen name="WaterConsumptionScreen" component={WaterConsumptionScreen} />
         <Stack.Screen name="HomeOverview" component={HomeOverview} />
         <Stack.Screen name="AddBeverageScreen" component={AddBeverageScreen} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
+        <Stack.Screen name="TimeSelection" component={TimeSelection} />
+        <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
+
+        
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

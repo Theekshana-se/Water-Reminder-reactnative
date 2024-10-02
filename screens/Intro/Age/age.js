@@ -1,44 +1,46 @@
 import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
-import { useNavigation } from '@react-navigation/native';
 import WheelPickerExpo from "react-native-wheel-picker-expo";
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Button from "../../../components/Buttons/Button";
 import IntroImage from "../../../components/Intro/IntroImage";
+import { age, GENDER_SCREEN } from "../../../constants/screens";
 import { GlobalStyles } from "../../../constants/styles";
-import { updateUserWeight } from '../../../lib/appwrite'; // Import the function
+import { updateUserAge } from '../../../lib/appwrite'; // Import the updateUserAge function
 
-const WEIGHTS = [
-  40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120,
-];
+const AGES = Array.from({ length: 83 }, (_, i) => i + 18); // Generates ages from 18 to 100
 
-const Weight = ({ selectedGender }) => {
-  const [weight, setWeight] = useState(70);
+const Age = () => {
+  const [age, setAge] = useState(25);
   const navigation = useNavigation(); // Hook to access navigation
+  const route = useRoute();
+  const { weight, selectedGender } = route.params; // Receive data from Weight screen
 
+  // This function handles storing age in the database and navigating to the next page
   const nextPageHandler = async () => {
     try {
-      await updateUserWeight(weight); // Save weight to Appwrite database
-      console.log('Weight saved successfully');
-      navigation.navigate('Age', { weight, selectedGender });
+      await updateUserAge(age); // Save age to Appwrite database
+      console.log('Age saved successfully');
+      navigation.navigate("ActivityLevelScreen", { age, weight, selectedGender });
     } catch (error) {
-      console.error('Failed to save weight:', error);
+      console.error('Failed to save age:', error);
     }
   };
 
   const goBackHandler = () => {
-    navigation.navigate('GenderScreen');
+    navigation.navigate(GENDER_SCREEN);
   };
 
-  const weightChangeHandler = ({ item }) => {
-    setWeight(item.value);
+  const ageChangeHandler = ({ item }) => {
+    setAge(item.value);
   };
 
-  const weightImage =
+  const ageImage =
     selectedGender === "male"
       ? require("../../../assets/weights/weight-male.png")
       : require("../../../assets/weights/weight-female.png");
 
-  const textColorWeight =
+  const textColorAge =
     selectedGender === "male"
       ? styles.maleActiveTextColor
       : styles.femaleActiveTextColor;
@@ -47,10 +49,10 @@ const Weight = ({ selectedGender }) => {
     <View style={styles.container}>
       <View style={styles.genderContainer}>
         <IntroImage
-          mainImageSrc={weightImage}
+          mainImageSrc={ageImage}
           textImageSrc={null}
-          text="How much do you weigh?"
-          activeColor={textColorWeight}
+          text="How old are you?"
+          activeColor={textColorAge}
         />
         <View style={styles.imageContainer}>
           <WheelPickerExpo
@@ -59,12 +61,12 @@ const Weight = ({ selectedGender }) => {
             width={60}
             renderItem={(props) => (
               <View>
-                <Text style={[styles.text, textColorWeight]}>{props.label}</Text>
+                <Text style={[styles.text, textColorAge]}>{props.label}</Text>
               </View>
             )}
-            initialSelectedIndex={6}
-            onChange={weightChangeHandler}
-            items={WEIGHTS.map((value) => ({ label: value, value: value }))}
+            initialSelectedIndex={7}
+            onChange={ageChangeHandler}
+            items={AGES.map((value) => ({ label: value, value: value }))}
           />
         </View>
       </View>
@@ -84,7 +86,7 @@ const Weight = ({ selectedGender }) => {
   );
 };
 
-export default Weight;
+export default Age;
 
 const styles = StyleSheet.create({
   container: {
@@ -109,12 +111,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 28,
     fontWeight: "bold",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "80%",
-    marginTop: "auto",
   },
   button: {
     backgroundColor: GlobalStyles.colors.primary400,
