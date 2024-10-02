@@ -19,6 +19,21 @@ const NotificationScreen = () => {
   const [interval, setInterval] = useState(null);
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
 
+  // Array of messages to send as notifications
+  const messages = [
+    "It's time to drink water! 💧",
+    "Stay hydrated! Grab a glass of water.",
+    "Don't forget to drink water! 🌊",
+    "Water is life! Take a sip now.",
+    "Feeling thirsty? Drink some water! 💦"
+  ];
+
+  // Randomly select a message from the messages array
+  const getRandomMessage = () => {
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    return messages[randomIndex];
+  };
+
   useEffect(() => {
     const loadTimes = async () => {
       try {
@@ -55,13 +70,20 @@ const NotificationScreen = () => {
     return true;
   };
 
+  // Cancel existing notifications before scheduling new ones
+  const cancelExistingNotifications = async () => {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+  };
+
   // Schedule notification based on selected interval
   const scheduleNotification = async (interval) => {
+    await cancelExistingNotifications(); // Cancel any existing notifications
+
     if (isNotificationEnabled) {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: 'Drink Water Reminder 💧',
-          body: `It's time to drink water!`,
+          body: getRandomMessage(), // Pick a random message
           sound: true,
         },
         trigger: {
@@ -108,7 +130,7 @@ const NotificationScreen = () => {
       <Text style={styles.subheading}>Notification Interval</Text>
       <View style={styles.intervalContainer}>
         {[
-          30, 45, 60, 90, 120, 180, 240, 300,2
+          30, 45, 60, 90, 120, 180, 240, 300, 2,
         ].map((intervalOption) => (
           <TouchableOpacity
             key={intervalOption}
