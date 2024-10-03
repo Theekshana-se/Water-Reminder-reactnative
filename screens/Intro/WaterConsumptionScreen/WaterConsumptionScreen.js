@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { updateUserWaterConsumption } from '../../../lib/appwrite'; // Your new function
 
@@ -51,6 +51,7 @@ const WaterConsumptionScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backButtonText}>←</Text>
       </TouchableOpacity>

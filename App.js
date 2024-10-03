@@ -1,12 +1,11 @@
-import { Provider } from "react-redux";
-import { store } from "./store/store";
-
-import { StatusBar } from "expo-status-bar";
-import Navigation from "./navigation/Navigation";
-import * as Notifications from "expo-notifications";
-import { useEffect } from "react";
-import Button from "./components/Buttons/Button";
-import { Text } from "react-native";
+import React, { useEffect, useState } from 'react';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
+import { StatusBar } from 'expo-status-bar';
+import Navigation from './navigation/Navigation';
+import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // For session persistence
+import { View, Text } from 'react-native'; // For handling loading state
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -15,38 +14,59 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-console.log("Start");
+
+console.log('Start');
 
 const trigger = new Date(Date.now() + 60 * 60 * 1000);
 trigger.setMinutes(0);
 trigger.setSeconds(0);
 
-// Notifications.scheduleNotificationAsync({
-//   content: {
-//     title: "Remember to drink water!",
-//   },
-//   trigger: {
-//     seconds: 10,
-//     repeats: false,
-//   },
-// });
-
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    scheduleNotificationHandler();
+    checkLoginSession();
   }, []);
+
+  const checkLoginSession = async () => {
+    try {
+      const session = await AsyncStorage.getItem('userSession'); // Check session
+      if (session) {
+        setIsLoggedIn(true); // Session exists, so keep the user logged in
+      }
+    } catch (error) {
+      console.error('Failed to retrieve session:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const scheduleNotificationHandler = async () => {
     Notifications.scheduleNotificationAsync({
       content: {
-        title: "Remember to drink water!",
+        title: 'Remember to drink water!',
       },
       trigger,
     });
   };
+
+  useEffect(() => {
+    scheduleNotificationHandler();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <Provider store={store}>
       <StatusBar translucent style="auto" />
-      <Navigation />
+      <Navigation isLoggedIn={isLoggedIn} />
     </Provider>
   );
 }

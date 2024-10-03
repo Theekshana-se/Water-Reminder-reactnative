@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-native';
-import { fetchUserWakeUpTime, fetchUserBedtime } from '../../lib/appwrite'; // Import Appwrite functions
+import { View, Text, StyleSheet,TouchableOpacity, Alert, Switch, Image } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
-import * as TaskManager from 'expo-task-manager';
-import * as BackgroundFetch from 'expo-background-fetch';
+import { fetchUserWakeUpTime, fetchUserBedtime } from '../../lib/appwrite';
 
 // Configure notification behavior
 Notifications.setNotificationHandler({
@@ -30,34 +28,13 @@ const getRandomMessage = () => {
   return messages[randomIndex];
 };
 
-// Define the background task for notifications
-TaskManager.defineTask('BACKGROUND_NOTIFICATION_TASK', async () => {
-  try {
-    // Schedule a random notification
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Drink Water Reminder 💧',
-        body: getRandomMessage(),
-        sound: true,
-      },
-      trigger: {
-        seconds: 0, // Trigger immediately in the background
-      },
-    });
-
-    // Return that new data was fetched
-    return BackgroundFetch.BackgroundFetchResult.NewData;
-  } catch (error) {
-    console.error('Error in background task:', error);
-    return BackgroundFetch.BackgroundFetchResult.Failed;
-  }
-});
-
-const NotificationScreen = () => {
+const NotificationScreen = ({ drinkProgress }) => {
   const [wakeUpTime, setWakeUpTime] = useState('Loading...');
   const [bedtime, setBedtime] = useState('Loading...');
   const [interval, setInterval] = useState(null);
   const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
+  const [isWaterProgressNotificationEnabled, setIsWaterProgressNotificationEnabled] = useState(false);
+  const [hasTriggeredWaterNotification, setHasTriggeredWaterNotification] = useState(false); // Track if water progress notification has been sent
 
   useEffect(() => {
     const loadTimes = async () => {
@@ -73,26 +50,73 @@ const NotificationScreen = () => {
 
     loadTimes();
 
-    // Request notification permissions on mount
+  }, []);
+
+  // Request notification permissions on mount
+  useEffect(() => {
+    const requestNotificationPermissions = async () => {
+      const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== 'granted') {
+        const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        finalStatus = status;
+      }
+
+      if (finalStatus !== 'granted') {
+        Alert.alert('Permission Required', 'We need permission to send notifications.');
+        return false;
+      }
+
+      return true;
+    };
+
     requestNotificationPermissions();
   }, []);
 
-  // Request permissions for sending notifications
-  const requestNotificationPermissions = async () => {
-    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-    let finalStatus = existingStatus;
 
-    if (existingStatus !== 'granted') {
-      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-      finalStatus = status;
+
+  // Handle enabling/disabling notifications for water progress
+  const toggleWaterProgressNotification = () => {
+    setIsWaterProgressNotificationEnabled((previousState) => {
+      const newState = !previousState;
+      console.log('Toggling Water Progress Notifications:', newState);
+      return newState;
+    });
+  };
+  
+
+  const handleWaterProgressNotification = () => {
+    console.log(`Current drinkProgress: ${drinkProgress}`);
+    console.log(`Water Progress Notifications Enabled: ${isWaterProgressNotificationEnabled}`);
+  
+    // Trigger the water progress notification only if the toggle is enabled (true) and drinkProgress >= 60
+    if ( drinkProgress >= 70 && !hasTriggeredWaterNotification) {
+      console.log('Triggering water progress notification');
+      sendWaterProgressNotification();
+      setHasTriggeredWaterNotification(true); // Prevent multiple notifications for the same threshold
+    } 
+    
+    // Reset the notification trigger if the progress goes below 60 or toggle is disabled
+    else if (drinkProgress < 70 || !isWaterProgressNotificationEnabled) {
+      setHasTriggeredWaterNotification(false); // Reset if progress drops below 60 or notifications are disabled
     }
+  };
 
-    if (finalStatus !== 'granted') {
-      Alert.alert('Permission Required', 'We need permission to send notifications.');
-      return false;
-    }
+  useEffect(() => {
+    handleWaterProgressNotification();
+  }, [drinkProgress, isWaterProgressNotificationEnabled]);
 
-    return true;
+  const sendWaterProgressNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Water Progress Alert 🚰',
+        body: `You have reached ${drinkProgress}% of your water goal!`,
+        sound: true,
+      },
+      trigger: { seconds: 2 }, // Send notification immediately
+    });
+    console.log('Water progress notification sent');
   };
 
   // Cancel existing notifications before scheduling new ones
@@ -102,14 +126,19 @@ const NotificationScreen = () => {
 
   // Schedule notification based on selected interval
   const scheduleNotification = async (interval) => {
-    await cancelExistingNotifications(); // Cancel any existing notifications
-
+    // Schedule notification only if notifications are enabled
     if (isNotificationEnabled) {
+      await cancelExistingNotifications(); // Cancel any existing notifications
+
       await Notifications.scheduleNotificationAsync({
         content: {
           title: 'Drink Water Reminder 💧',
           body: getRandomMessage(), // Pick a random message
           sound: true,
+          priority: Notifications.AndroidNotificationPriority.HIGH, // High priority for Android devices
+          android: {
+            visibility: Notifications.AndroidNotificationVisibility.PUBLIC, // Show on lock screen
+          },
         },
         trigger: {
           seconds: interval * 60, // Convert interval to seconds
@@ -117,43 +146,20 @@ const NotificationScreen = () => {
         },
       });
       Alert.alert('Notification scheduled', `Every ${interval} minutes`);
-
-      // Register background fetch with the selected interval
-      registerBackgroundFetch(interval);
-    }
-  };
-
-  // Register the background fetch task
-  const registerBackgroundFetch = async (interval) => {
-    try {
-      const status = await BackgroundFetch.getStatusAsync();
-      console.log('BackgroundFetch status:', status);
-
-      if (status !== BackgroundFetch.Status.Available) {
-        console.log('Background fetch is not available.');
-        return;
-      }
-
-      await BackgroundFetch.registerTaskAsync('BACKGROUND_NOTIFICATION_TASK', {
-        minimumInterval: interval * 60, // Adjust this based on selected interval in seconds
-        stopOnTerminate: false, // Android only
-        startOnBoot: true, // Android only
-      });
-
-      console.log('Background fetch registered');
-    } catch (error) {
-      console.error('Error registering background fetch:', error);
+    } else {
+      // If notifications are disabled, cancel all notifications
+      await cancelExistingNotifications();
     }
   };
 
   // Handle enabling/disabling notifications
-  const toggleNotification = () => {
+  const toggleNotification = async () => {
     setIsNotificationEnabled((previousState) => !previousState);
+
     if (!isNotificationEnabled) {
       Alert.alert('Notifications Enabled', 'You will receive notifications at the selected interval.');
     } else {
-      Notifications.cancelAllScheduledNotificationsAsync(); // Cancel any scheduled notifications
-      BackgroundFetch.unregisterTaskAsync('BACKGROUND_NOTIFICATION_TASK'); // Unregister background fetch task
+      await cancelExistingNotifications(); // Cancel any scheduled notifications
       Alert.alert('Notifications Disabled', 'Notifications have been turned off.');
     }
   };
@@ -170,10 +176,12 @@ const NotificationScreen = () => {
 
       <View style={styles.timeContainer}>
         <View style={styles.timeBlock}>
+        <Image source={require('../../assets/reminder/sun.png')} style={styles.timeIcon} />
           <Text style={styles.timeLabel}>From</Text>
           <Text style={styles.timeValue}>{wakeUpTime}</Text>
         </View>
         <View style={styles.timeBlock}>
+        <Image source={require('../../assets/reminder/moon.png')} style={styles.timeIcon} />
           <Text style={styles.timeLabel}>To</Text>
           <Text style={styles.timeValue}>{bedtime}</Text>
         </View>
@@ -181,18 +189,13 @@ const NotificationScreen = () => {
 
       <Text style={styles.subheading}>Notification Interval</Text>
       <View style={styles.intervalContainer}>
-        {[
-          30, 45, 60, 90, 120, 180, 240, 300, 2,
-        ].map((intervalOption) => (
+        {[30, 45, 60, 90, 120, 180, 240, 300, 2, 0.5].map((intervalOption) => (
           <TouchableOpacity
             key={intervalOption}
-            style={[
-              styles.intervalButton,
-              interval === intervalOption ? styles.intervalSelected : {},
-            ]}
+            style={[styles.intervalButton, interval === intervalOption ? styles.intervalSelected : {}]}
             onPress={() => handleIntervalSelect(intervalOption)}
           >
-            <Text>{intervalOption < 60 ? `${intervalOption} minutes` : `${intervalOption / 60} hours`}</Text>
+            <Text style={styles.intervalButtonText}>{intervalOption < 60 ? `${intervalOption} minutes` : `${intervalOption / 60} hours`}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -241,20 +244,31 @@ const styles = StyleSheet.create({
   intervalContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 20, // Adjust for spacing
   },
   intervalButton: {
-    borderWidth: 1,
-    borderColor: '#00aaff',
-    borderRadius: 5,
-    padding: 10,
-    margin: 5,
+    backgroundColor: '#00aaff',
+    borderRadius: 30, // More rounded to match the image
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    margin: 8, // Adjust margin for proper spacing
+    minWidth: 120,
+    justifyContent: 'center',
     alignItems: 'center',
-    minWidth: 80,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   intervalSelected: {
-    backgroundColor: '#00aaff',
+    backgroundColor: '#99ccff', // Lighter version of blue when selected
+  },
+  intervalButtonText: {
     color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   toggleContainer: {
     flexDirection: 'row',
@@ -262,6 +276,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
     paddingHorizontal: 40,
+  },
+  timeIcon: {
+    width: 50,
+    height: 50,
+    marginBottom: 5,
   },
 });
 

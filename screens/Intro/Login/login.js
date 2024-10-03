@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { loginUser } from '../../../lib/appwrite'; // Adjust the path if necessary
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, StatusBar } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import { loginUser } from '../../../lib/appwrite'; 
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -12,18 +13,34 @@ const Login = ({ navigation }) => {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
     }
-
+  
     setIsLoading(true);
     try {
       const session = await loginUser(email, password);
       console.log('Login successful:', session);
-      Alert.alert('Success', 'Logged in successfully');
-      navigation.navigate('Intro');
+      
+      // Store session in AsyncStorage
+      await AsyncStorage.setItem('userSession', JSON.stringify(session));
+      
+      // Check if the user is new or has completed onboarding
+      const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+
+      if (onboardingCompleted === null) {
+        // If onboarding status doesn't exist, set it to false (new user)
+        await AsyncStorage.setItem('onboardingCompleted', 'false');
+        navigation.navigate('Intro');  // Show Intro as user is new
+    
+      } else if (onboardingCompleted === 'false') {
+        // If onboarding is not completed, continue to show the Intro
+        navigation.navigate('Intro');
+      } else {
+        // Onboarding is complete, go to Home
+        navigation.navigate('HomeOverview');
+      }
     } catch (error) {
       console.error('Login error:', error);
       let errorMessage = 'An unexpected error occurred. Please try again.';
       
-      // Handle specific Appwrite errors
       if (error.code === 401) {
         errorMessage = 'Invalid email or password.';
       } else if (error.message) {
@@ -34,10 +51,11 @@ const Login = ({ navigation }) => {
     } finally {
       setIsLoading(false);
     }
-};
+  };
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
       <Text style={styles.title}>Welcome Back!</Text>
       <Text>Please enter your email and password to sign in.</Text>
       <TextInput

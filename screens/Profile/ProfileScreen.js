@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { account } from '../../lib/appwrite';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   fetchUserWaterConsumption,
   fetchUserWeight,
@@ -59,6 +60,9 @@ const ProfileScreen = () => {
 
   const handleLogout = async () => {
     try {
+      // Clear session from AsyncStorage
+      await AsyncStorage.removeItem('userSession');
+
       const currentUser = await account.get();
       if (currentUser) {
         await account.deleteSession('current');
@@ -69,7 +73,6 @@ const ProfileScreen = () => {
       Alert.alert('Error', 'No active session to log out from.');
     }
   };
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.profileContainer}>

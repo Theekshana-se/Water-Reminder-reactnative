@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, StatusBar } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import WheelPickerExpo from "react-native-wheel-picker-expo";
 import Button from "../../../components/Buttons/Button";
@@ -45,6 +45,7 @@ const Weight = ({ selectedGender }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
       <View style={styles.genderContainer}>
         <IntroImage
           mainImageSrc={weightImage}

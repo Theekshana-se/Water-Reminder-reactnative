@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, StatusBar } from 'react-native';
 import { createUser } from '../../../lib/appwrite'; // Adjust path as necessary
 
 const Registration = ({ navigation }) => {
@@ -23,6 +23,7 @@ const Registration = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
       <Text style={styles.title}>Create your Account</Text>
       <Text>Please fill in your details to create your account.</Text>
       <TextInput

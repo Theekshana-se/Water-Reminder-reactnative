@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet , StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 const activityLevels = [
@@ -22,6 +22,7 @@ const ActivityLevelScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
       <Text style={styles.title}>Activity Level</Text>
       {activityLevels.map((level, index) => (
         <TouchableOpacity

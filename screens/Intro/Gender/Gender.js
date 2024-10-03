@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, StyleSheet, View, Text } from "react-native";
+import { Image, StyleSheet, View, Text, StatusBar } from "react-native";
 
 import Button from "../../../components/Buttons/Button";
 import IntroImage from "../../../components/Intro/IntroImage";
@@ -38,6 +38,7 @@ const Gender = ({ onNextPage }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
       <View style={styles.genderContainer}>
         <IntroImage
           mainImageSrc={require("../../../assets/genders/gender.png")}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, StatusBar } from "react-native";
 import WheelPickerExpo from "react-native-wheel-picker-expo";
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Button from "../../../components/Buttons/Button";
@@ -47,6 +47,7 @@ const Age = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
       <View style={styles.genderContainer}>
         <IntroImage
           mainImageSrc={ageImage}

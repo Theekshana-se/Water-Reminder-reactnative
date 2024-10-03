@@ -8,7 +8,7 @@ import Home from "../screens/Home/Home";
 import History from "../screens/History/History";
 import Settings from "../screens/Settings/Settings";
 import Profile from "../screens/Profile/ProfileScreen"; // New screen for Profile
-import Location from "../screens/Location/Location"; // New screen for Location
+import Location from "../screens/Location/LocationMapScreen"; // New screen for Location
 import { GlobalStyles } from "../constants/styles";
 import AddBeverageScreen from '../screens/Beverage/AddBeverageScreen';
 import Intro from '../screens/Intro/Intro';
@@ -21,7 +21,8 @@ import ProfileScreen from "../screens/Profile/ProfileScreen";
 import EditProfile from "../screens/Profile/EditProfileScreen";
 import TimeSelection from "../screens/Intro/Time/TimeSelection";
 import NotificationScreen from "../screens/NotificationScreen/NotificationScreen"
-
+import LocationMapScreen from "../screens/Location/LocationMapScreen";
+import ShopDetails from "../screens/Location/ShopDetailsScreen";
 
 
 const Stack = createNativeStackNavigator();
@@ -73,14 +74,14 @@ function HomeOverview() {
       })}
     >
       <BottomTab.Screen name="Home" component={Home} />
-      <BottomTab.Screen name="Location" component={Location} />
+      <BottomTab.Screen name="Location" component={LocationMapScreen} />
       <BottomTab.Screen
         name="Alarm"
         component={NotificationScreen}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <View style={styles.floatingIcon}>
-              <Ionicons name="alarm" size={30} color={focused ? "#00aaff" : "#00aafff"} />
+              <Ionicons name="alarm" size={30} color={focused ? "#ffffff" : "#8e8e93"} />
             </View>
           ),
         }}
@@ -131,9 +132,8 @@ export default function Navigation() {
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="TimeSelection" component={TimeSelection} />
         <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
-
-        
-        
+        <Stack.Screen name="LocationMapScreen" component={LocationMapScreen} />
+        <Stack.Screen name="ShopDetails" component={ShopDetails} />
       </Stack.Navigator>
     </NavigationContainer>
   );

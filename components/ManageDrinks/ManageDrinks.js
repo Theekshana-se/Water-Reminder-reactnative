@@ -6,6 +6,7 @@ import UIModal from "../UI/UIModal";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from '@expo/vector-icons';
 import ImprovedWaterGlass from './ImprovedWaterGlass';
+import NotificationScreen from '../../screens/NotificationScreen/NotificationScreen'; // Import NotificationScreen
 
 const ManageDrinks = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -86,7 +87,7 @@ const ManageDrinks = () => {
   );
 
   const resetWaterProgress = () => {
-    setDrinkProgress(0);
+    setDrinkProgress(0); // Reset the drink progress
   };
 
   return (
@@ -132,6 +133,9 @@ const ManageDrinks = () => {
       <TouchableOpacity style={styles.resetButton} onPress={resetWaterProgress}>
         <Feather name="refresh-cw" size={24} color="white" />
       </TouchableOpacity>
+
+      {/* Pass drinkProgress prop to NotificationScreen */}
+      <NotificationScreen drinkProgress={drinkProgress} /> 
 
       <UIModal
         isVisible={isModalVisible}
