@@ -7,8 +7,9 @@ import { useNavigation } from "@react-navigation/native";
 import { Feather } from '@expo/vector-icons';
 import ImprovedWaterGlass from './ImprovedWaterGlass';
 import NotificationScreen from '../../screens/NotificationScreen/NotificationScreen'; // Import NotificationScreen
+import WeeklyProgress from '../../screens/WeeklyProgress/WeeklyProgress';
 
-const ManageDrinks = () => {
+const ManageDrinks = ({ userId }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [drinkProgress, setDrinkProgress] = useState(0);
   const [selectedQuantity, setSelectedQuantity] = useState(0);
@@ -135,7 +136,8 @@ const ManageDrinks = () => {
       </TouchableOpacity>
 
       {/* Pass drinkProgress prop to NotificationScreen */}
-      <NotificationScreen drinkProgress={drinkProgress} /> 
+      <NotificationScreen drinkProgress={drinkProgress}/> 
+      <WeeklyProgress drinkProgress={drinkProgress} userId={userId}/> 
 
       <UIModal
         isVisible={isModalVisible}

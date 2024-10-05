@@ -16,20 +16,25 @@ const Login = ({ navigation }) => {
   
     setIsLoading(true);
     try {
-      const session = await loginUser(email, password);
+      const { session, accountId } = await loginUser(email, password);
+  
+      if (!accountId) {
+        throw new Error('Failed to retrieve user account ID.');
+      }
+  
       console.log('Login successful:', session);
-      
+  
       // Store session in AsyncStorage
       await AsyncStorage.setItem('userSession', JSON.stringify(session));
-      
+      await AsyncStorage.setItem('accountId', accountId);
+  
       // Check if the user is new or has completed onboarding
       const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
-
+  
       if (onboardingCompleted === null) {
         // If onboarding status doesn't exist, set it to false (new user)
         await AsyncStorage.setItem('onboardingCompleted', 'false');
         navigation.navigate('Intro');  // Show Intro as user is new
-    
       } else if (onboardingCompleted === 'false') {
         // If onboarding is not completed, continue to show the Intro
         navigation.navigate('Intro');
@@ -39,19 +44,12 @@ const Login = ({ navigation }) => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      let errorMessage = 'An unexpected error occurred. Please try again.';
-      
-      if (error.code === 401) {
-        errorMessage = 'Invalid email or password.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      Alert.alert('Login Failed', errorMessage);
+      Alert.alert('Login Failed', error.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <View style={styles.container}>

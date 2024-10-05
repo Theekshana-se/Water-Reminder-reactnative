@@ -23,6 +23,7 @@ import TimeSelection from "../screens/Intro/Time/TimeSelection";
 import NotificationScreen from "../screens/NotificationScreen/NotificationScreen"
 import LocationMapScreen from "../screens/Location/LocationMapScreen";
 import ShopDetails from "../screens/Location/ShopDetailsScreen";
+import WeeklyProgress from "../screens/WeeklyProgress/WeeklyProgress"
 
 
 const Stack = createNativeStackNavigator();
@@ -86,7 +87,7 @@ function HomeOverview() {
           ),
         }}
       />
-      <BottomTab.Screen name="Settings" component={Settings} />
+      <BottomTab.Screen name="Settings" component={WeeklyProgress} />
       <BottomTab.Screen name="Profile" component={ProfileScreen} />
     </BottomTab.Navigator>
   );
@@ -134,6 +135,9 @@ export default function Navigation() {
         <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
         <Stack.Screen name="LocationMapScreen" component={LocationMapScreen} />
         <Stack.Screen name="ShopDetails" component={ShopDetails} />
+        <Stack.Screen name="WeeklyProgress" component={WeeklyProgress} />
+
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

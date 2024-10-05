@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, StatusBar } from 'react-native';
 import { createUser } from '../../../lib/appwrite'; // Adjust path as necessary
+import AsyncStorage from '@react-native-async-storage/async-storage'; // AsyncStorage for managing state
 
 const Registration = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -13,8 +14,11 @@ const Registration = ({ navigation }) => {
       const response = await createUser(email, password, username);
       console.log('User created successfully:', response);
       Alert.alert('Success', 'User registered successfully');
-      // Navigate to Login screen after successful registration
-      navigation.navigate('Login');
+      
+      // Do NOT set the onboarding flag yet
+      // Navigate to Intro screens for onboarding
+      navigation.navigate('Intro');
+      
     } catch (error) {
       console.error('Error creating user:', error);
       Alert.alert('Error', 'Unable to create account. Try again.');
