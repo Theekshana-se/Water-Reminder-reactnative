@@ -6,7 +6,7 @@ import UIModal from "../UI/UIModal";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from '@expo/vector-icons';
 import ImprovedWaterGlass from './ImprovedWaterGlass';
-import NotificationScreen from '../../screens/NotificationScreen/NotificationScreen'; // Import NotificationScreen
+import NotificationScreen from '../../screens/NotificationScreen/NotificationScreen'; 
 import WeeklyProgress from '../../screens/WeeklyProgress/WeeklyProgress';
 
 const ManageDrinks = ({ userId }) => {
@@ -24,7 +24,7 @@ const ManageDrinks = ({ userId }) => {
     { id: 3, value: 250, text: "250ml" },
     { id: 4, value: 300, text: "300ml" },
     { id: 5, value: 350, text: "350ml" },
-    { id: 6, value: 0, text: "Add more" },
+    { id: 6, value: 400, text: "400ml" },
   ];
 
   useEffect(() => {
@@ -105,7 +105,7 @@ const ManageDrinks = ({ userId }) => {
           >
             <View style={[styles.beverageIcon, selectedBeverage === beverage && styles.selectedBeverageIcon]}>
               <Text style={styles.beverageEmoji}>
-                {beverage === 'Coffee' ? '☕' : beverage === 'Yogurt' ? '🥛' : '🍵'}
+                {beverage === 'Coffee' ? '☕' : beverage === 'Yogurt' ? '🍶' : beverage === 'Milk' ? '🥛': beverage === 'Tea' ? '🍵':beverage === 'Orange Juice' ? '🍊':beverage === 'Red Wine' ? '🍷': '🥤'}
               </Text>
             </View>
             <Text style={styles.beverageText}>{beverage}</Text>
@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     backgroundColor: '#f5f5f5',
+    padding:5,
   },
   beveragePrompt: {
     fontSize: 16,

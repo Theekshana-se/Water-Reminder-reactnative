@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet , StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet , StatusBar, ImageBackground } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { GlobalStyles } from "../../../constants/styles";
+import Icon from 'react-native-vector-icons/Ionicons';
+import Button from '../../../components/Buttons/Button';
 
 const activityLevels = [
   'Sedentary',
@@ -19,87 +22,122 @@ const ActivityLevelScreen = () => {
   const continueHandler = () => {
     navigation.navigate('WaterConsumptionScreen', { age, weight, selectedGender, activityLevel: activityLevels[selectedLevel] });
   };
+  const goBackHandler = () => {
+    navigation.goBack();
+  };
+
+  const backgroundImage = require("../../../assets/splash.png"); // Background image path
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
-      <Text style={styles.title}>Activity Level</Text>
-      {activityLevels.map((level, index) => (
-        <TouchableOpacity
-          key={level}
-          style={styles.optionContainer}
-          onPress={() => setSelectedLevel(index)}
-        >
-          <View style={[styles.radio, selectedLevel === index && styles.radioSelected]} />
-          <Text style={styles.optionText}>{level}</Text>
-        </TouchableOpacity>
-      ))}
-      <TouchableOpacity style={styles.continueButton} onPress={continueHandler}>
-        <Text style={styles.continueButtonText}>CONTINUE</Text>
-      </TouchableOpacity>
-    </View>
+    <ImageBackground source={backgroundImage} style={styles.background} imageStyle={styles.backgroundImage}>
+      <View style={styles.container}>
+        <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
+        <Text style={styles.title}>Activity Level</Text>
+        <Text style={styles.subtitle}>
+          Your activity level affects your water intake. Whether you're an athlete or have a more relaxed lifestyle, we've got you covered.
+        </Text>
+        <View style={styles.optionsWrapper}>
+          {activityLevels.map((level, index) => (
+            <TouchableOpacity
+              key={level}
+              style={styles.optionContainer}
+              onPress={() => setSelectedLevel(index)}
+            >
+              <View style={[styles.radio, selectedLevel === index && styles.radioSelected]} />
+              <Text style={styles.optionText}>{level}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <Button buttonStyles={styles.button} onPress={goBackHandler}>
+            <Icon name="chevron-back-outline" size={24} color={GlobalStyles.colors.white} />
+          </Button>
+
+          <Button buttonStyles={styles.button} onPress={continueHandler}>
+            <Text style={styles.buttonText}>NEXT</Text>
+          </Button>
+        </View>
+      </View>
+    </ImageBackground>
   );
 };
 
+export default ActivityLevelScreen;
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  backgroundImage: {
+    opacity: 0.1, // Reduce opacity of the background image
+  },
   container: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
-    backgroundColor: 'white',
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: 20,
-  },
-  backButtonText: {
-    fontSize: 24,
-    color: '#87CEFA',
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#87CEFA',
-    marginBottom: 10,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.primary400,
+    marginTop: 20,
+    textAlign: 'center',
   },
-  description: {
+  subtitle: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
+    color: "#555",
+    textAlign: "center",
+    marginVertical: 10,
+    paddingHorizontal: 30,
   },
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
+    marginTop:20
   },
   radio: {
     height: 24,
     width: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#87CEFA',
+    borderColor: GlobalStyles.colors.primary400,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
   },
   radioSelected: {
-    backgroundColor: '#87CEFA',
+    backgroundColor: GlobalStyles.colors.primary400,
   },
   optionText: {
     fontSize: 16,
   },
-  continueButton: {
-    backgroundColor: '#87CEFA',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 20,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+    marginTop: 40,
+    marginBottom: 40,
   },
-  continueButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
+  button: {
+    marginTop: 40,
+    backgroundColor: GlobalStyles.colors.primary400,
+    paddingVertical: 10,
+    width: "45%",
+    borderRadius: 25,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center", // Center content vertically
+  },
+  buttonText: {
+    color: GlobalStyles.colors.white,
+    fontWeight: "bold",
+    fontSize: 18,
+    textTransform: "uppercase",
+    textAlign: 'center', // Ensure the text is centered
   },
 });
-
-export default ActivityLevelScreen;

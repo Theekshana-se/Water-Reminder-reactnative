@@ -23,7 +23,22 @@ import TimeSelection from "../screens/Intro/Time/TimeSelection";
 import NotificationScreen from "../screens/NotificationScreen/NotificationScreen"
 import LocationMapScreen from "../screens/Location/LocationMapScreen";
 import ShopDetails from "../screens/Location/ShopDetailsScreen";
-import WeeklyProgress from "../screens/WeeklyProgress/WeeklyProgress"
+import WeeklyProgress from "../screens/WeeklyProgress/WeeklyProgress";
+import SplashScreen from "../screens/Intro/SplashScreen/SplashScreen";
+import WelcomeScreen from "../screens/Intro/SplashScreen/WelcomeScreen";
+import OnboardingScreen1 from "../screens/Intro/SplashScreen/OnboardingScreen1";
+import OnboardingScreen2 from "../screens/Intro/SplashScreen/OnboardingScreen2";
+import OnboardingScreen3 from "../screens/Intro/SplashScreen/OnboardingScreen3";
+import ShopRegistrationScreen1 from "../screens/Profile/ShopRegistration/ShopRegistrationScreen1";
+import ShopRegistrationScreen2 from "../screens/Profile/ShopRegistration/ShopRegistrationScreen2";
+import DailyTips from '../screens/Profile/Tips/DailyTips';
+import ForActionDays from '../screens/Profile/Tips/ForActionDays';
+import HotWeatherTips from '../screens/Profile/Tips/HotWeatherTips';
+import HealthWellness from '../screens/Profile/Tips/HealthWellness';
+import GenderScreen from '../screens/Intro/Gender/Gender'
+import Weight from '../screens/Intro/Weight/Weight';
+
+
 
 
 const Stack = createNativeStackNavigator();
@@ -74,21 +89,86 @@ function HomeOverview() {
         tabBarInactiveTintColor: "#8e8e93",
       })}
     >
-      <BottomTab.Screen name="Home" component={Home} />
-      <BottomTab.Screen name="Location" component={LocationMapScreen} />
-      <BottomTab.Screen
-        name="Alarm"
-        component={NotificationScreen}
-        options={{
-          tabBarIcon: ({ focused, color, size }) => (
-            <View style={styles.floatingIcon}>
-              <Ionicons name="alarm" size={30} color={focused ? "#ffffff" : "#8e8e93"} />
-            </View>
-          ),
-        }}
-      />
-      <BottomTab.Screen name="Settings" component={WeeklyProgress} />
-      <BottomTab.Screen name="Profile" component={ProfileScreen} />
+      <BottomTab.Screen 
+            name="Home" 
+            component={Home}
+            options={{
+              title: 'Daily Water Consumption', // This changes the header title
+              headerTitleAlign: 'center', // Aligns the header title in the center
+              headerTitleStyle: {
+                fontSize: 20, // Customize the font size
+                fontWeight: 'bold', // Make the title bold
+                color: '#00aaff', // Customize the color
+              },
+            }}
+          />
+           <BottomTab.Screen 
+            name="Location" 
+            component={LocationMapScreen}
+            options={{
+              title: 'Find Pure Water', // This changes the header title
+              headerTitleAlign: 'center', // Aligns the header title in the center
+              headerTitleStyle: {
+                fontSize: 20, // Customize the font size
+                fontWeight: 'bold', // Make the title bold
+                color: '#00aaff', // Customize the color
+              },
+            }}
+          />
+     <BottomTab.Screen
+          name="Alarm"
+          component={NotificationScreen}
+          options={{
+            title: 'Reminder', // Add this line to set the title
+            headerTitleAlign: 'center', // Align the title in the center
+            headerTitleStyle: {
+              fontSize: 20,
+              fontWeight: 'bold',
+              color: '#00aaff',
+            },
+            tabBarIcon: ({ focused, color, size }) => (
+              <View style={styles.floatingIcon}>
+                <Ionicons name="alarm" size={30} color={focused ? "#ffffff" : "#8e8e93"} />
+              </View>
+            ),
+          }}
+        />
+
+        <BottomTab.Screen
+          name="Settings"
+          component={WeeklyProgress}
+          options={{
+            title: 'Weekly Progress', // This changes the header title
+            headerTitleAlign: 'center', // Aligns the header title in the center
+            headerTitleStyle: {
+              fontSize: 20, // Customize the font size
+              fontWeight: 'bold', // Make the title bold
+              color: '#00aaff', // Customize the color
+            },
+            tabBarIcon: ({ focused, size }) => (
+              <View style={focused ? styles.focusedTab : null}>
+                <Ionicons
+                  name={focused ? "analytics" : "analytics-outline"} // Change to progress icon
+                  size={focused ? 30 : 24}
+                  color={focused ? "#00aaff" : "#8e8e93"} // Set color based on focus
+                />
+              </View>
+            ),
+          }}
+        />
+          <BottomTab.Screen 
+            name="Profile" 
+            component={ProfileScreen}
+            options={{
+              title: 'Profile', // This changes the header title
+              headerTitleAlign: 'center', // Aligns the header title in the center
+              headerTitleStyle: {
+                fontSize: 20, // Customize the font size
+                fontWeight: 'bold', // Make the title bold
+                color: '#00aaff', // Customize the color
+              },
+            }}
+          />
     </BottomTab.Navigator>
   );
 }
@@ -99,6 +179,12 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 10,
     elevation: 10,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#00aaff',
+    marginLeft: 10,
   },
   floatingIcon: {
     position: "absolute",
@@ -121,10 +207,16 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="OnboardingScreen1" component={OnboardingScreen1} options={{ headerShown: false }} />
+        <Stack.Screen name="OnboardingScreen2" component={OnboardingScreen2} options={{ headerShown: false }} />
+        <Stack.Screen name="OnboardingScreen3" component={OnboardingScreen3} options={{ headerShown: false }} />
+        <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Registration" component={Registration} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Intro" component={Intro} />
       <Stack.Screen name="Age" component={Age} />
+      <Stack.Screen name="GenderScreen" component={GenderScreen} />
       <Stack.Screen name="ActivityLevelScreen" component={ActivityLevelScreen} />
       <Stack.Screen name="WaterConsumptionScreen" component={WaterConsumptionScreen} />
         <Stack.Screen name="HomeOverview" component={HomeOverview} />
@@ -136,8 +228,13 @@ export default function Navigation() {
         <Stack.Screen name="LocationMapScreen" component={LocationMapScreen} />
         <Stack.Screen name="ShopDetails" component={ShopDetails} />
         <Stack.Screen name="WeeklyProgress" component={WeeklyProgress} />
-
-        
+        <Stack.Screen name="ShopRegistrationScreen1" component={ShopRegistrationScreen1} options={{ headerShown: false }}/>
+        <Stack.Screen name="ShopRegistrationScreen2" component={ShopRegistrationScreen2} options={{ headerShown: false }}/>
+        <Stack.Screen name="DailyTips" component={DailyTips} />
+      <Stack.Screen name="ForActionDays" component={ForActionDays} />
+      <Stack.Screen name="HotWeatherTips" component={HotWeatherTips} />
+      <Stack.Screen name="HealthWellness" component={HealthWellness} />
+      <Stack.Screen name="Weight" component={Weight} />
       </Stack.Navigator>
     </NavigationContainer>
   );

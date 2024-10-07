@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Alert, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Alert, StatusBar } from 'react-native';
 import WheelPickerExpo from 'react-native-wheel-picker-expo';
 import Button from '../../../components/Buttons/Button';
 import { GlobalStyles } from '../../../constants/styles';
@@ -22,7 +22,7 @@ const TimeSelection = ({ selectedGender }) => {
     try {
       await updateWakeUpTime(wakeUpTime); 
       await updateBedtime(bedtime); 
-      Alert.alert('Success', 'Times saved successfully!');
+      //Alert.alert('Success', 'Times saved successfully!');
       
       // Call completeOnboarding to store the onboarding completion status
       completeOnboarding();
@@ -35,7 +35,6 @@ const TimeSelection = ({ selectedGender }) => {
 
   const completeOnboarding = async () => {
     try {
-      // Save onboarding completion status to AsyncStorage
       await AsyncStorage.setItem('onboardingCompleted', 'true');
       
       // Navigate to Home after completing onboarding
@@ -60,11 +59,14 @@ const TimeSelection = ({ selectedGender }) => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
-      {/* Wake-up Time Section */}
-      <View style={styles.timeContainer}>
-        <Image source={require('../../../assets/defaultprofilepic.jpg')} style={styles.timeImage} />
-        <Text style={[styles.timeTitle, styles.textColor]}>Wake-up Time</Text>
-        <View style={styles.wheelPickerContainer}>
+      <Text style={styles.title}>Select your wake up and bedtime </Text>
+
+      {/* Horizontal layout for Wake-up Time and Bedtime */}
+      <View style={styles.horizontalSection}>
+        {/* Wake-up Time Section */}
+        <View style={styles.timeSection}>
+          <Text style={[styles.emoji, { color: '#FFD700' }]}>🌅</Text>
+          <Text style={styles.timeTitle}>WakeUpTime</Text>
           <WheelPickerExpo
             backgroundColor="#F2F2F2"
             height={180}
@@ -79,13 +81,11 @@ const TimeSelection = ({ selectedGender }) => {
             items={TIMES.map((value) => ({ label: value, value: value }))}
           />
         </View>
-      </View>
 
-      {/* Bedtime Section */}
-      <View style={styles.timeContainer}>
-        <Image source={require('../../../assets/defaultprofilepic.jpg')} style={styles.timeImage} />
-        <Text style={[styles.timeTitle, styles.textColor]}>Bedtime</Text>
-        <View style={styles.wheelPickerContainer}>
+        {/* Bedtime Section */}
+        <View style={styles.timeSection}>
+          <Text style={[styles.emoji, { color: '#1E90FF' }]}>🌙</Text>
+          <Text style={styles.timeTitle}>BedTime</Text>
           <WheelPickerExpo
             backgroundColor="#F2F2F2"
             height={180}
@@ -126,44 +126,58 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 30,
   },
-  timeContainer: {
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: GlobalStyles.colors.primary400,
+    textAlign: 'center',
+    marginTop:50,
+    marginBottom: 50,  // Reduced space between title and time section
+  },
+  horizontalSection: {
+    flexDirection: 'row', // Align the time sections horizontally
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  timeSection: {
     alignItems: 'center',
-    marginBottom: 20,
+    flex: 1, // Equal width for both sections
+    marginHorizontal: 10, // Add some horizontal space between sections
   },
-  timeImage: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
+  emoji: {
+    fontSize: 50, // Larger font size for emojis
+    marginBottom: 5, // Reduce the space between emoji and time title
   },
   timeTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  wheelPickerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    marginBottom: 5, // Reduce space between title and picker
+    color: GlobalStyles.colors.primary400,
   },
   text: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: GlobalStyles.colors.primary400,
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     width: '80%',
     marginTop: 'auto',
+    marginBottom: 90,  // Adjusted bottom margin for better positioning
   },
   button: {
     backgroundColor: GlobalStyles.colors.primary400,
-    marginTop: 40,
-    marginBottom: 40,
+    marginTop: 10,
     paddingVertical: 10,
-    width: '30%',
+    width: '45%',
     borderRadius: 25,
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonText: {
     color: GlobalStyles.colors.white,

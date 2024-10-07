@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { GlobalStyles } from '../../constants/styles';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 const AddBeverageScreen = ({ route }) => {
   const [selectedBeverage, setSelectedBeverage] = useState(null);
@@ -18,7 +19,7 @@ const AddBeverageScreen = ({ route }) => {
     { name: 'Milk', emoji: '🥛' },
     { name: 'Soda', emoji: '🥤' },
     { name: 'Yogurt', emoji: '🍶' },
-];
+  ];
 
   const handleSave = () => {
     if (selectedBeverage && hydrationLevel) {
@@ -31,24 +32,30 @@ const AddBeverageScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add your Beverages</Text>
+      {/* Back Button and Title */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back-outline" size={30} color="#00aaff" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Add your Beverages</Text>
+      </View>
 
       <Text style={styles.subTitle}>Enter Beverage Type</Text>
       <View style={styles.beverageGrid}>
-  {beverageOptions.map((beverage, index) => (
-    <TouchableOpacity
-      key={index}
-      style={[
-        styles.beverageItem,
-        selectedBeverage === beverage.name && styles.selectedBeverage,
-      ]}
-      onPress={() => setSelectedBeverage(beverage.name)}
-    >
-      <Text style={styles.beverageEmoji}>{beverage.emoji}</Text>
-      <Text style={styles.beverageText}>{beverage.name}</Text>
-    </TouchableOpacity>
-  ))}
-</View>
+        {beverageOptions.map((beverage, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.beverageItem,
+              selectedBeverage === beverage.name && styles.selectedBeverage,
+            ]}
+            onPress={() => setSelectedBeverage(beverage.name)}
+          >
+            <Text style={styles.beverageEmoji}>{beverage.emoji}</Text>
+            <Text style={styles.beverageText}>{beverage.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <Text style={styles.subTitle}>Enter Hydration Level</Text>
       <TextInput
@@ -74,12 +81,18 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'white',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    width: '100%',
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: GlobalStyles.colors.primary700,
-    textAlign: 'center',
-    marginBottom: 20,
+    color: '#00aaff',
+    marginLeft: 10,
   },
   subTitle: {
     fontSize: 18,
@@ -104,9 +117,8 @@ const styles = StyleSheet.create({
   selectedBeverage: {
     borderColor: GlobalStyles.colors.primary300,
   },
-  beverageImage: {
-    width: 50,
-    height: 50,
+  beverageEmoji: {
+    fontSize: 24,
   },
   beverageText: {
     fontSize: 14,

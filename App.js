@@ -3,17 +3,11 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { StatusBar } from 'expo-status-bar';
 import Navigation from './navigation/Navigation';
-import * as Notifications from 'expo-notifications';
+
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For session persistence
 import { View, Text } from 'react-native'; // For handling loading state
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+
 
 console.log('Start');
 
@@ -42,18 +36,7 @@ export default function App() {
     }
   };
 
-  const scheduleNotificationHandler = async () => {
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Remember to drink water!',
-      },
-      trigger,
-    });
-  };
 
-  useEffect(() => {
-    scheduleNotificationHandler();
-  }, []);
 
   if (loading) {
     return (

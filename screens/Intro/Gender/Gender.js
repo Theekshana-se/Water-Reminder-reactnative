@@ -29,21 +29,22 @@ const Gender = ({ onNextPage }) => {
   };
 
   const maleImageSource = maleImageSelected
-    ? require("../../../assets/genders/male-selected.png")
-    : require("../../../assets/genders/male.png");
+    ? require("../../../assets/male1select.png")
+    : require("../../../assets/male1.png");
 
   const femaleImageSource = femaleImageSelected
-    ? require("../../../assets/genders/female-selected.png")
-    : require("../../../assets/genders/female.png");
+    ? require("../../../assets/femaleselect.png")
+    : require("../../../assets/female.png");
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
+      <Text style={styles.title}>Let’s personalize your Daily Hydration Goal</Text>
+      <Text style={styles.subtitle}>
+        Gender influences how much water your body requires. Let’s ensure you’re meeting the right hydration goals.
+      </Text>
       <View style={styles.genderContainer}>
-        <IntroImage
-          mainImageSrc={require("../../../assets/genders/gender.png")}
-          textImageSrc={require("../../../assets/genders/select-gender.png")}
-        />
+
         <View style={styles.genderImageContainer}>
           <Button
             onPress={maleSelectedHandler}
@@ -103,6 +104,20 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: GlobalStyles.colors.primary400,
+    marginTop: 40,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#555',
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 30,
   },
   genderContainer: {
     marginTop: "auto",

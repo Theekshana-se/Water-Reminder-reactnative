@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Image, StatusBar, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment'; // For handling dates
 
@@ -87,10 +87,14 @@ const WeeklyProgress = ({ drinkProgress, userId }) => {
     loadUserProgress();
   }, [userId]);
 
+  const daysInMonth = moment().daysInMonth(); // Get total days in the current month
+  const filledDays = weekProgress.filter(item => item.progress === 100).length; // Count filled days
+  const monthProgress = (filledDays / daysInMonth) * 100; // Calculate progress percentage
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
       <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
-      <Text style={styles.title}>Progress Level</Text>
+      <Text style={styles.title}></Text>
 
       {/* Water Bottles */}
       <View style={styles.bottleRow}>
@@ -125,6 +129,12 @@ const WeeklyProgress = ({ drinkProgress, userId }) => {
         </View>
       </View>
 
+      {/* Monthly Progress Bar */}
+      <View style={styles.progressContainer}>
+        <View style={[styles.progressBar, { width: `${monthProgress}%` }]} />
+      </View>
+      <Text style={styles.progressText}>{monthProgress.toFixed(2)}% Monthly Progress</Text>
+
       {/* Top Performing Friends */}
       <View style={styles.friendsContainer}>
         <Text style={styles.friendsTitle}>Top performing Friends!</Text>
@@ -153,13 +163,18 @@ const WeeklyProgress = ({ drinkProgress, userId }) => {
           </View>
         </View>
       </View>
-    </View>
+      </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
+    backgroundColor: '#f7f7f7',
+  },
+  scrollContainer: {
+    paddingBottom: 20, // To avoid content being cut off at the bottom
     padding: 20,
     backgroundColor: '#f7f7f7',
   },
@@ -247,6 +262,22 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#ddd',
     marginRight: 5,
+  },
+  progressContainer: {
+    height: 10,
+    backgroundColor: '#ddd',
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginVertical: 20,
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#00aaff',
+  },
+  progressText: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
 });
 

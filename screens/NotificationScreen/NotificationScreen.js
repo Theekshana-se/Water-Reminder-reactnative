@@ -172,7 +172,7 @@ const NotificationScreen = ({ drinkProgress }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Reminder</Text>
+      <Text style={styles.heading}></Text>
 
       <View style={styles.timeContainer}>
         <View style={styles.timeBlock}>

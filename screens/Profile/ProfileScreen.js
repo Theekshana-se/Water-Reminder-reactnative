@@ -3,6 +3,8 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } fr
 import { useNavigation } from '@react-navigation/native';
 import { account } from '../../lib/appwrite';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Modal from 'react-native-modal'; // Import Modal for the pop-up
+
 import {
   fetchUserWaterConsumption,
   fetchUserWeight,
@@ -28,6 +30,8 @@ const ProfileScreen = () => {
     age: 'Loading...',
     profilePic: defaultProfilePic,
   });
+
+  const [isModalVisible, setModalVisible] = useState(false); // State for Modal visibility
 
   useEffect(() => {
     const loadProfileData = async () => {
@@ -60,9 +64,7 @@ const ProfileScreen = () => {
 
   const handleLogout = async () => {
     try {
-      // Clear session from AsyncStorage
       await AsyncStorage.removeItem('userSession');
-
       const currentUser = await account.get();
       if (currentUser) {
         await account.deleteSession('current');
@@ -73,13 +75,47 @@ const ProfileScreen = () => {
       Alert.alert('Error', 'No active session to log out from.');
     }
   };
+
+  // Toggle Modal visibility
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={toggleModal}>
+          <Text style={styles.threeDots}>⋮</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={toggleModal} // Close modal when clicking outside
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        backdropOpacity={0} // Removes the dimming effect
+        animationInTiming={200} // Faster animation in
+        animationOutTiming={200} // Faster animation out
+        style={styles.modalStyle}
+      >
+        <View style={styles.modalContent}>
+          <TouchableOpacity onPress={() => { navigation.navigate('DailyTips'); toggleModal(); }}>
+            <Text style={styles.modalText}>Daily Tips</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { navigation.navigate('ShopRegistrationScreen1'); toggleModal(); }}>
+            <Text style={styles.modalText}>Join with Us</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={toggleModal}>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
       <View style={styles.profileContainer}>
         <Image source={{ uri: profile.profilePic }} style={styles.profileImage} />
         <TouchableOpacity
           style={styles.editButton}
-          onPress={() => navigation.navigate('EditProfile', { profile })} // Pass profile data
+          onPress={() => navigation.navigate('EditProfile', { profile })}
         >
           <Text style={styles.editText}>EDIT PROFILE</Text>
         </TouchableOpacity>
@@ -87,7 +123,7 @@ const ProfileScreen = () => {
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>💧 Intake Goal: {profile.intakeGoal}</Text>
-        <Text style={styles.infoText}>💧 Username: {profile.username}</Text>
+        <Text style={styles.infoText}>👤 Username: {profile.username}</Text>
         <Text style={styles.infoText}>📧 Email: {profile.email}</Text>
         <Text style={styles.infoText}>⚖️ Weight: {profile.weight}</Text>
         <Text style={styles.infoText}>🎂 Age: {profile.age}</Text>
@@ -104,12 +140,39 @@ const ProfileScreen = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 20, // Ensure content has padding to prevent cutting off
     backgroundColor: '#f7f7f7',
     padding: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 10,
+  },
+  threeDots: {
+    fontSize: 30,
+  },
+  modalStyle: {
+    justifyContent: 'flex-start', // Aligns the modal at the top
+    alignItems: 'flex-end', // Aligns the modal to the right
+    margin: 0, // Removes default margin
+    paddingTop: 60, // Adds padding to position below the top bar
+    paddingRight: 20, // Align with the three dots button
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: 'transparent', // No shadow color
+    elevation: 0, // No elevation
+    width: 150, // Adjust width as per your design
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 10,
   },
   profileContainer: {
     alignItems: 'center',
@@ -148,6 +211,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fff',
     elevation: 2,
+    marginBottom: 20, // Adds space at the bottom
   },
   logoutButton: {
     backgroundColor: '#ff4d4d',

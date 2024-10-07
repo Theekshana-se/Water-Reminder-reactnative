@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, StatusBar, ImageBackground } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { updateUserWaterConsumption } from '../../../lib/appwrite'; // Your new function
+import { GlobalStyles } from "../../../constants/styles";
+import Button from '../../../components/Buttons/Button';
+import Icon from 'react-native-vector-icons/Ionicons';
+
 
 const WaterConsumptionScreen = () => {
   const route = useRoute();
@@ -49,103 +53,99 @@ const WaterConsumptionScreen = () => {
     }
   };
 
+  const goBackHandler = () => {
+    navigation.goBack();
+  };
+
+  const backgroundImage = require("../../../assets/waterlevelscreen.png"); // Background image path
+
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backButtonText}>←</Text>
-      </TouchableOpacity>
-      
-      <Text style={styles.title}>Set Your Daily Water Goal</Text>
+    <ImageBackground source={backgroundImage} style={styles.background} imageStyle={styles.backgroundImage}>
+      <View style={styles.container}>
+        <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
+        <Text style={styles.title}>Set Your Daily Water Goal</Text>
 
-      <Text style={styles.waterIntakeText}>{waterIntake}ml</Text>
+        <Text style={styles.waterIntakeText}>{waterIntake}ml</Text>
+        
+        {/* Button container with back and next buttons */}
+        <View style={styles.buttonContainer}>
+          <Button buttonStyles={styles.button} onPress={goBackHandler}>
+            <Icon name="chevron-back-outline" size={24} color={GlobalStyles.colors.white} />
+          </Button>
 
-      <Image style={styles.waterImage} source={require('../../../assets/weights/weight-male.png')} />
-      
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.editButton}>
-          <Text style={styles.buttonText}>EDIT</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.recalculateButton}>
-          <Text style={styles.buttonText}>RECALCULATE</Text>
-        </TouchableOpacity>
+          <Button buttonStyles={styles.button} onPress={continueHandler}>
+            <Text style={styles.buttonText}>Next</Text>
+          </Button>
+        </View>
       </View>
-      
-      <TouchableOpacity style={styles.continueButton} onPress={continueHandler}>
-        <Text style={styles.continueButtonText}>CONTINUE</Text>
-      </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 };
 
 export default WaterConsumptionScreen;
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    //position: "relative", // Ensure the image stays within the container
+  },
+  backgroundImage: {
+    width: 300, // Adjusted width for larger image
+    height: 300, // Adjusted height for larger image
+    position: "absolute", // Keep the image centered relative to the screen
+    top: "50%", // Center it vertically
+    left: "50%", // Center it horizontally
+    transform: [{ translateX: -140 }, { translateY: -120 }], // Half of the width and height (200px), centers the image properly
+    opacity: 0.7, // Control the opacity as needed
+  },
   container: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: 20,
-  },
-  backButtonText: {
-    fontSize: 24,
-    color: '#87CEFA',
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#87CEFA',
+    fontWeight: "bold",
+    color: GlobalStyles.colors.primary400,
     marginBottom: 20,
+    textAlign: 'center',
   },
   waterIntakeText: {
     fontSize: 48,
     fontWeight: 'bold',
     color: '#333',
+    marginBottom: 20,
   },
   waterImage: {
     width: 100,
     height: 100,
     marginVertical: 20,
   },
-  buttonsContainer: {
+  buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '60%',
-    marginBottom: 30,
+    width: '80%',
+    marginTop: 40,
+    marginBottom: 40,
   },
-  editButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  recalculateButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
+  button: {
+    marginTop: 350,
+    backgroundColor: GlobalStyles.colors.primary400,
+    paddingVertical: 10,
+    width: "45%",
+    borderRadius: 25,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center", // Center content vertically
   },
   buttonText: {
-    color: '#333',
-    fontWeight: 'bold',
-  },
-  continueButton: {
-    backgroundColor: '#87CEFA',
-    padding: 15,
-    borderRadius: 5,
-    width: '80%',
-    alignItems: 'center',
-  },
-  continueButtonText: {
-    color: 'white',
+    color: GlobalStyles.colors.white,
+    fontWeight: "bold",
     fontSize: 18,
-    fontWeight: 'bold',
+    textTransform: "uppercase",
+    textAlign: 'center', // Ensure the text is centered
   },
 });
