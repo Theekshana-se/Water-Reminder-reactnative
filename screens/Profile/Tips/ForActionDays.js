@@ -15,18 +15,44 @@ const ForActionDays = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>For Action Days</Text>
       </View>
-      
       <ScrollView style={styles.tipsContainer}>
-        <View style={styles.tip}>
-          <Text style={styles.tipText}>Drink water 30 minutes before exercising to ensure you're hydrated from the start.</Text>
-        </View>
-        <View style={styles.tip}>
-          <Text style={styles.tipText}>Take water breaks every 20 minutes during intense activities.</Text>
-        </View>
-        <View style={styles.tip}>
-          <Text style={styles.tipText}>Replenish fluids lost during exercise by drinking extra water afterward.</Text>
-        </View>
-      </ScrollView>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Drink water 30 minutes before exercising to ensure you're hydrated from the start.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Take water breaks every 20 minutes during intense activities.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Replenish fluids lost during exercise by drinking extra water afterward.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Stay hydrated in both hot and cold weather; your body needs water in all conditions.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Drinking water during long workouts helps maintain endurance and performance.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Monitor the color of your urine—pale yellow indicates good hydration.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Carry a reusable water bottle to track your water intake during the day.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Add electrolytes to your water if you're engaging in long, sweaty workouts.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Drink water before and after meals to support digestion and metabolism.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Don't wait until you're thirsty to drink water—stay ahead of dehydration.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Drink water before bed to keep hydrated overnight, but not too much to avoid sleep disturbances.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Use a hydration app to set reminders for drinking water throughout the day.</Text>
+          </View>
+        </ScrollView>
     </View>
   );
 };

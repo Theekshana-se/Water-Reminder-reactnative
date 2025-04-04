@@ -1,26 +1,23 @@
+import React from 'react';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import Home from "../screens/Home/Home";
-import History from "../screens/History/History";
-import Settings from "../screens/Settings/Settings";
-import Profile from "../screens/Profile/ProfileScreen"; // New screen for Profile
-import Location from "../screens/Location/LocationMapScreen"; // New screen for Location
 import { GlobalStyles } from "../constants/styles";
 import AddBeverageScreen from '../screens/Beverage/AddBeverageScreen';
 import Intro from '../screens/Intro/Intro';
 import Registration from '../screens/Intro/Register/Register';
 import Login from '../screens/Intro/Login/login';
-import Age from '../screens/Intro/Age/age'
+import Age from '../screens/Intro/Age/age';
 import ActivityLevelScreen from "../screens/Intro/ActivityLevel/ActivityLevelScreen";
-import WaterConsumptionScreen from "../screens/Intro/WaterConsumptionScreen/WaterConsumptionScreen"
+import WaterConsumptionScreen from "../screens/Intro/WaterConsumptionScreen/WaterConsumptionScreen";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
 import EditProfile from "../screens/Profile/EditProfileScreen";
 import TimeSelection from "../screens/Intro/Time/TimeSelection";
-import NotificationScreen from "../screens/NotificationScreen/NotificationScreen"
+import NotificationScreen from "../screens/NotificationScreen/NotificationScreen";
 import LocationMapScreen from "../screens/Location/LocationMapScreen";
 import ShopDetails from "../screens/Location/ShopDetailsScreen";
 import WeeklyProgress from "../screens/WeeklyProgress/WeeklyProgress";
@@ -35,10 +32,11 @@ import DailyTips from '../screens/Profile/Tips/DailyTips';
 import ForActionDays from '../screens/Profile/Tips/ForActionDays';
 import HotWeatherTips from '../screens/Profile/Tips/HotWeatherTips';
 import HealthWellness from '../screens/Profile/Tips/HealthWellness';
-import GenderScreen from '../screens/Intro/Gender/Gender'
+import GenderScreen from '../screens/Intro/Gender/Gender';
 import Weight from '../screens/Intro/Weight/Weight';
-
-
+import ContactUsScreen from "../screens/Profile/contactus/ContactUsScreen";
+import ChatScreen from '../screens/chatbot/ChatScreen';
+import EditShopScreen from '../screens/Profile/ShopRegistration/EditShopScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -58,7 +56,7 @@ function HomeOverview() {
           shadowRadius: 20,
           elevation: 20,
         },
-        tabBarShowLabel: false, // Remove labels under icons
+        tabBarShowLabel: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -72,103 +70,96 @@ function HomeOverview() {
             iconName = focused ? "alarm" : "alarm-outline";
             color = focused ? "#00aaff" : "#8e8e93";
           } else if (route.name === "Settings") {
-            iconName = focused ? "settings" : "settings-outline";
+            iconName = focused ? "analytics" : "analytics-outline";
             color = focused ? "#00aaff" : "#8e8e93";
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
             color = focused ? "#00aaff" : "#8e8e93";
+          } else if (route.name === "Bot") {
+            iconName = focused ? "chatbubble" : "chatbubble-outline";
+            color = focused ? "#00aaff" : "#8e8e93";
           }
 
           return (
-            <View style={focused ? styles.focusedTab : null}>
+            <View style={focused && route.name !== "Alarm" ? styles.focusedTab : null}>
               <Ionicons name={iconName} size={focused ? 30 : 24} color={color} />
             </View>
           );
         },
-        tabBarActiveTintColor: GlobalStyles.colors.primary500,
+        tabBarActiveTintColor: GlobalStyles.colors?.primary500 || "#00aaff",
         tabBarInactiveTintColor: "#8e8e93",
       })}
     >
       <BottomTab.Screen 
-            name="Home" 
-            component={Home}
-            options={{
-              title: 'Daily Water Consumption', // This changes the header title
-              headerTitleAlign: 'center', // Aligns the header title in the center
-              headerTitleStyle: {
-                fontSize: 20, // Customize the font size
-                fontWeight: 'bold', // Make the title bold
-                color: '#00aaff', // Customize the color
-              },
-            }}
-          />
-           <BottomTab.Screen 
-            name="Location" 
-            component={LocationMapScreen}
-            options={{
-              title: 'Find Pure Water', // This changes the header title
-              headerTitleAlign: 'center', // Aligns the header title in the center
-              headerTitleStyle: {
-                fontSize: 20, // Customize the font size
-                fontWeight: 'bold', // Make the title bold
-                color: '#00aaff', // Customize the color
-              },
-            }}
-          />
-     <BottomTab.Screen
-          name="Alarm"
-          component={NotificationScreen}
-          options={{
-            title: 'Reminder', // Add this line to set the title
-            headerTitleAlign: 'center', // Align the title in the center
-            headerTitleStyle: {
-              fontSize: 20,
-              fontWeight: 'bold',
-              color: '#00aaff',
-            },
-            tabBarIcon: ({ focused, color, size }) => (
-              <View style={styles.floatingIcon}>
-                <Ionicons name="alarm" size={30} color={focused ? "#ffffff" : "#8e8e93"} />
-              </View>
-            ),
-          }}
-        />
-
-        <BottomTab.Screen
-          name="Settings"
-          component={WeeklyProgress}
-          options={{
-            title: 'Weekly Progress', // This changes the header title
-            headerTitleAlign: 'center', // Aligns the header title in the center
-            headerTitleStyle: {
-              fontSize: 20, // Customize the font size
-              fontWeight: 'bold', // Make the title bold
-              color: '#00aaff', // Customize the color
-            },
-            tabBarIcon: ({ focused, size }) => (
-              <View style={focused ? styles.focusedTab : null}>
-                <Ionicons
-                  name={focused ? "analytics" : "analytics-outline"} // Change to progress icon
-                  size={focused ? 30 : 24}
-                  color={focused ? "#00aaff" : "#8e8e93"} // Set color based on focus
-                />
-              </View>
-            ),
-          }}
-        />
-          <BottomTab.Screen 
-            name="Profile" 
-            component={ProfileScreen}
-            options={{
-              title: 'Profile', // This changes the header title
-              headerTitleAlign: 'center', // Aligns the header title in the center
-              headerTitleStyle: {
-                fontSize: 20, // Customize the font size
-                fontWeight: 'bold', // Make the title bold
-                color: '#00aaff', // Customize the color
-              },
-            }}
-          />
+        name="Home" 
+        component={Home}
+        options={{
+          title: 'Daily Water Consumption',
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: '#00aaff',
+          },
+        }}
+      />
+      <BottomTab.Screen 
+        name="Location" 
+        component={LocationMapScreen}
+        options={{
+          title: 'Find Pure Water',
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: '#00aaff',
+          },
+        }}
+      />
+      <BottomTab.Screen
+        name="Alarm"
+        component={NotificationScreen}
+        options={{
+          title: 'Reminder',
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: '#00aaff',
+          },
+          tabBarIcon: ({ focused }) => (
+            <View style={styles.floatingIcon}>
+              <Ionicons name="alarm" size={30} color={focused ? "#ffffff" : "#8e8e93"} />
+            </View>
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="Settings"
+        component={WeeklyProgress}
+        options={{
+          title: 'Weekly Progress',
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: '#00aaff',
+          },
+        }}
+      />
+      <BottomTab.Screen 
+        name="Profile" 
+        component={ProfileScreen}
+        options={{
+          title: 'Profile',
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: '#00aaff',
+          },
+        }}
+      />
     </BottomTab.Navigator>
   );
 }
@@ -179,12 +170,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 10,
     elevation: 10,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#00aaff',
-    marginLeft: 10,
   },
   floatingIcon: {
     position: "absolute",
@@ -206,35 +191,38 @@ const styles = StyleSheet.create({
 export default function Navigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="OnboardingScreen1" component={OnboardingScreen1} options={{ headerShown: false }} />
-        <Stack.Screen name="OnboardingScreen2" component={OnboardingScreen2} options={{ headerShown: false }} />
-        <Stack.Screen name="OnboardingScreen3" component={OnboardingScreen3} options={{ headerShown: false }} />
-        <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Registration" component={Registration} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Intro" component={Intro} />
-      <Stack.Screen name="Age" component={Age} />
-      <Stack.Screen name="GenderScreen" component={GenderScreen} />
-      <Stack.Screen name="ActivityLevelScreen" component={ActivityLevelScreen} />
-      <Stack.Screen name="WaterConsumptionScreen" component={WaterConsumptionScreen} />
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Splash">
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="OnboardingScreen1" component={OnboardingScreen1} />
+        <Stack.Screen name="OnboardingScreen2" component={OnboardingScreen2} />
+        <Stack.Screen name="OnboardingScreen3" component={OnboardingScreen3} />
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Registration" component={Registration} />
+        <Stack.Screen name="Login" component={Login} options={{ headerShown: true, title: 'Login', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="Intro" component={Intro} />
+        <Stack.Screen name="Age" component={Age} />
+        <Stack.Screen name="GenderScreen" component={GenderScreen} />
+        <Stack.Screen name="ActivityLevelScreen" component={ActivityLevelScreen} />
+        <Stack.Screen name="WaterConsumptionScreen" component={WaterConsumptionScreen} />
         <Stack.Screen name="HomeOverview" component={HomeOverview} />
-        <Stack.Screen name="AddBeverageScreen" component={AddBeverageScreen} />
-        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="AddBeverageScreen" component={AddBeverageScreen} options={{ headerShown: true, title: 'Add Beverage', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: true, title: 'Profile', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="TimeSelection" component={TimeSelection} />
-        <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
-        <Stack.Screen name="LocationMapScreen" component={LocationMapScreen} />
-        <Stack.Screen name="ShopDetails" component={ShopDetails} />
-        <Stack.Screen name="WeeklyProgress" component={WeeklyProgress} />
-        <Stack.Screen name="ShopRegistrationScreen1" component={ShopRegistrationScreen1} options={{ headerShown: false }}/>
-        <Stack.Screen name="ShopRegistrationScreen2" component={ShopRegistrationScreen2} options={{ headerShown: false }}/>
-        <Stack.Screen name="DailyTips" component={DailyTips} />
-      <Stack.Screen name="ForActionDays" component={ForActionDays} />
-      <Stack.Screen name="HotWeatherTips" component={HotWeatherTips} />
-      <Stack.Screen name="HealthWellness" component={HealthWellness} />
-      <Stack.Screen name="Weight" component={Weight} />
+        <Stack.Screen name="NotificationScreen" component={NotificationScreen} options={{ headerShown: true, title: 'Reminder', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="LocationMapScreen" component={LocationMapScreen} options={{ headerShown: true, title: 'Find Pure Water', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="ShopDetails" component={ShopDetails} options={{ headerShown: true, title: 'Shop Details', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="WeeklyProgress" component={WeeklyProgress} options={{ headerShown: true, title: 'Weekly Progress', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="ShopRegistrationScreen1" component={ShopRegistrationScreen1} />
+        <Stack.Screen name="ShopRegistrationScreen2" component={ShopRegistrationScreen2} />
+        <Stack.Screen name="DailyTips" component={DailyTips} options={{ headerShown: true, title: 'Daily Tips', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="ForActionDays" component={ForActionDays} options={{ headerShown: true, title: 'For Action Days', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="HotWeatherTips" component={HotWeatherTips} options={{ headerShown: true, title: 'Hot Weather Tips', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="HealthWellness" component={HealthWellness} options={{ headerShown: true, title: 'Health & Wellness', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="Weight" component={Weight} />
+        <Stack.Screen name="ContactUsScreen" component={ContactUsScreen} options={{ headerShown: true, title: 'Contact Us', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: true, title: 'Aqua bot', headerTitleAlign: 'center', headerTitleStyle: { fontSize: 20, fontWeight: 'bold', color: '#00aaff' } }} />
+        <Stack.Screen name="EditShopScreen" component={EditShopScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

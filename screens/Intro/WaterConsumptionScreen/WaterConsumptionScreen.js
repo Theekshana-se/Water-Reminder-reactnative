@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, StatusBar, ImageBackground } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { updateUserWaterConsumption } from '../../../lib/appwrite'; // Your new function
+import { updateUserWaterConsumption } from '../../../lib/appwrite';
 import { GlobalStyles } from "../../../constants/styles";
 import Button from '../../../components/Buttons/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
-
 
 const WaterConsumptionScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   
   const { age, weight, activityLevel } = route.params;
-
   const [waterIntake, setWaterIntake] = useState(0);
 
   const activityModifiers = {
@@ -44,8 +42,8 @@ const WaterConsumptionScreen = () => {
 
   const continueHandler = async () => {
     try {
-      // Save water consumption to the database
-      await updateUserWaterConsumption(waterIntake);
+      // Save water consumption (0) and daily goal (waterIntake) to the database
+      await updateUserWaterConsumption(0, waterIntake);
       console.log('Water consumption saved successfully');
       navigation.navigate('TimeSelection');
     } catch (error) {
@@ -57,7 +55,7 @@ const WaterConsumptionScreen = () => {
     navigation.goBack();
   };
 
-  const backgroundImage = require("../../../assets/waterlevelscreen.png"); // Background image path
+  const backgroundImage = require("../../../assets/waterlevelscreen.png");
 
   return (
     <ImageBackground source={backgroundImage} style={styles.background} imageStyle={styles.backgroundImage}>
@@ -67,7 +65,6 @@ const WaterConsumptionScreen = () => {
 
         <Text style={styles.waterIntakeText}>{waterIntake}ml</Text>
         
-        {/* Button container with back and next buttons */}
         <View style={styles.buttonContainer}>
           <Button buttonStyles={styles.button} onPress={goBackHandler}>
             <Icon name="chevron-back-outline" size={24} color={GlobalStyles.colors.white} />
@@ -89,16 +86,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    //position: "relative", // Ensure the image stays within the container
   },
   backgroundImage: {
-    width: 300, // Adjusted width for larger image
-    height: 300, // Adjusted height for larger image
-    position: "absolute", // Keep the image centered relative to the screen
-    top: "50%", // Center it vertically
-    left: "50%", // Center it horizontally
-    transform: [{ translateX: -140 }, { translateY: -120 }], // Half of the width and height (200px), centers the image properly
-    opacity: 0.7, // Control the opacity as needed
+    width: 300,
+    height: 300,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: -140 }, { translateY: -120 }],
+    opacity: 0.7,
   },
   container: {
     flex: 1,
@@ -119,11 +115,6 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 20,
   },
-  waterImage: {
-    width: 100,
-    height: 100,
-    marginVertical: 20,
-  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -139,13 +130,13 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center", // Center content vertically
+    alignItems: "center",
   },
   buttonText: {
     color: GlobalStyles.colors.white,
     fontWeight: "bold",
     fontSize: 18,
     textTransform: "uppercase",
-    textAlign: 'center', // Ensure the text is centered
+    textAlign: 'center',
   },
 });

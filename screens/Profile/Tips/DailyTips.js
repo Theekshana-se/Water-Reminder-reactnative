@@ -19,21 +19,58 @@ const DailyTips = () => {
       <Text style={styles.subtitle}>Hydration is the key to energy and focus—drink up!</Text>
 
       <View style={styles.tipsWrapper}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.tipsContainer}>
-        <View style={styles.tipsWrapper}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.tipsContainer}>
-            <View style={styles.tip}>
-            <Text style={styles.avatarEmoji}>💧</Text>
-            <Text style={styles.tipText}>Begin your day by drinking a glass of water right after waking up.</Text>
-            </View>
-            <View style={styles.tip}>
-            <Text style={styles.avatarEmoji}>💧</Text>
-            <Text style={styles.tipText}>Drink a small amount of water every hour to maintain hydration.</Text>
-            </View>
-        </ScrollView>
-        </View>
-        </ScrollView>
-      </View>
+  <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.tipsContainer}>
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>Begin your day by drinking a glass of water right after waking up.</Text>
+    </View>
+    
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>Drink a small amount of water every hour to maintain hydration.</Text>
+    </View>
+
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>Keep a water bottle with you throughout the day as a reminder to drink.</Text>
+    </View>
+
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>Add lemon or cucumber slices for a refreshing flavor boost to your water.</Text>
+    </View>
+
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>Try to drink at least 8 glasses (about 2 liters) of water every day.</Text>
+    </View>
+
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>Sip water before, during, and after exercise to stay hydrated.</Text>
+    </View>
+
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>Stay hydrated while traveling, especially on long flights or car trips.</Text>
+    </View>
+
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>Eat water-rich foods like cucumbers, oranges, and watermelons for extra hydration.</Text>
+    </View>
+
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>If you feel thirsty, you're already slightly dehydrated. Drink water often!</Text>
+    </View>
+
+    <View style={styles.tip}>
+      <Text style={styles.avatarEmoji}>💧</Text>
+      <Text style={styles.tipText}>Drink water before meals to help with digestion and control appetite.</Text>
+    </View>
+  </ScrollView>
+</View>
 
       <View style={styles.suggestionsContainer}>
         <TouchableOpacity style={styles.suggestionButton} onPress={() => navigation.navigate('ForActionDays')}>

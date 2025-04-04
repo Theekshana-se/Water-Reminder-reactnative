@@ -1,14 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, StatusBar, Clipboard, ToastAndroid } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const ShopDetailsScreen = ({ route }) => {
-  const { shop } = route.params;
+  const { shop } = route.params; // Receive shop details from the route
   const navigation = useNavigation();
 
   const handleGoBack = () => {
     navigation.goBack(); // Navigate back to the previous screen (Location page)
+  };
+
+  const copyToClipboard = (text) => {
+    Clipboard.setString(text);
+    ToastAndroid.show('Copied to clipboard!', ToastAndroid.SHORT);
   };
 
   return (
@@ -16,17 +21,64 @@ const ShopDetailsScreen = ({ route }) => {
       {/* StatusBar for visibility */}
       <StatusBar barStyle="dark-content" translucent={false} backgroundColor="#fff" />
 
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-        <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
+      {/* Back Button and Header Container */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+          <Ionicons name="arrow-back" size={24} color="#0A73FF" />
+        </TouchableOpacity>
+        <Text style={styles.header}>{shop.name}</Text>
+      </View>
 
-      <Text style={styles.shopName}>{shop.name}</Text>
-      <Image source={{ uri: 'https://www.perfectwater.co.za/wp-content/uploads/2013/07/2.jpg' }} style={styles.shopImage} />
-      <Text style={styles.shopAddress}>No 12, Galle Rd, {shop.name}</Text>
-      <Text style={styles.shopInfo}>📞 0772811676 / 011435787</Text>
-      <Text style={styles.shopInfo}>⏰ Open until 10:30 PM</Text>
-      <Text style={styles.shopInfo}>📄 License: CFA/BW/01/2021-01</Text>
+      {/* Shop Image */}
+      <Image source={{ uri: shop.image }} style={styles.shopImage} />
+
+      {/* Shop Information */}
+      <View style={styles.infoContainer}>
+        
+        {/* Shop Name */}
+        <View style={styles.infoRow}>
+          <Ionicons name="home-outline" size={20} color="#0A73FF" />
+          <Text style={styles.shopInfo}>{shop.name}</Text>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Shop Address */}
+        <View style={styles.infoRow}>
+          <Text style={styles.emoji}>🏠</Text>
+          <Text style={styles.shopInfo}>{shop.address}</Text>
+          <TouchableOpacity onPress={() => copyToClipboard(shop.address)}>
+            <Ionicons name="copy-outline" size={20} color="#0A73FF" style={styles.copyIcon} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Shop Phone Numbers */}
+        <View style={styles.infoRow}>
+          <Text style={styles.emoji}>📞</Text>
+          <Text style={styles.shopInfo}>{shop.phone}</Text>
+          <TouchableOpacity onPress={() => copyToClipboard(shop.phone)}>
+            <Ionicons name="copy-outline" size={20} color="#0A73FF" style={styles.copyIcon} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Shop Hours */}
+        <View style={styles.infoRow}>
+          <Text style={styles.emoji}>⏰</Text>
+          <Text style={styles.shopInfo}>{shop.hours}</Text>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* License Number */}
+        <View style={styles.infoRow}>
+          <Text style={styles.emoji}>📄</Text>
+          <Text style={styles.shopInfo}>{shop.license}</Text>
+        </View>
+      </View>
     </View>
   );
 };
@@ -34,34 +86,56 @@ const ShopDetailsScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
   },
-  backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    zIndex: 1,
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 20,
+    paddingTop: 40,
   },
-  shopName: {
+  backButton: {
+    marginRight: 10,
+  },
+  header: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-    marginTop: 60, // Adjust for back button space
+    color: '#0A73FF',
   },
   shopImage: {
-    width: '100%',
+    width: '90%',
     height: 200,
+    alignSelf: 'center',
+    marginTop: 20,
     borderRadius: 10,
-    marginBottom: 10,
   },
-  shopAddress: {
-    fontSize: 18,
-    marginBottom: 5,
+  infoContainer: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  emoji: {
+    fontSize: 20,
   },
   shopInfo: {
     fontSize: 16,
-    marginBottom: 10,
+    color: '#333',
+    marginLeft: 10,
+    flex: 1, // Makes the text take up the available space
+  },
+  copyIcon: {
+    marginLeft: 10,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 10,
   },
 });
 

@@ -1,5 +1,3 @@
-import SelectDropdown from "react-native-select-dropdown";
-
 import React from "react";
 import {
   FlatList,

@@ -1,22 +1,48 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Ionicons'; // For back button
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import MapView, { Marker } from 'react-native-maps';
+import { createShop } from '../../../lib/appwrite';
 
-const ShopRegistrationScreen2 = ({ route }) => {
+const ShopRegistrationScreen2 = () => {
   const navigation = useNavigation();
-  const [displayInfo, setDisplayInfo] = useState('');
+  const route = useRoute();
+  const { shopName, email, phoneNumber, address, hours, license, image, shopType } = route.params;
 
-  const { shopName, email, phoneNumber } = route.params;
+  const [location, setLocation] = useState({
+    latitude: 7.8731, // Default centered on Sri Lanka
+    longitude: 80.7718,
+  });
 
-  const handleRegister = () => {
-    // Handle registration logic
-    console.log("Shop Name:", shopName);
-    console.log("Email:", email);
-    console.log("Phone Number:", phoneNumber);
-    console.log("Display Info:", displayInfo);
+  const handleMapPress = (event) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    setLocation({ latitude, longitude });
+  };
 
-    // Redirect to success or another page after registration
+  const handleSubmit = async () => {
+    const shopData = {
+      name: shopName,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      address,
+      phone: phoneNumber,
+      hours,
+      license,
+      image,
+      email, // Ensure email is passed from Screen 1
+    };
+
+    try {
+      console.log('Submitting shop data:', shopData); // Log before submission
+      await createShop(shopData, shopType === 'waterBottle');
+      Alert.alert('Success', 'Shop registered successfully!');
+      navigation.navigate('LocationMapScreen');
+    } catch (error) {
+      console.error('Submission failed:', error.message); // Log specific error
+      console.error('Full error:', error); // Log full error details
+      Alert.alert('Error', `Failed to register shop: ${error.message || 'Unknown error'}`);
+    }
   };
 
   return (
@@ -25,23 +51,28 @@ const ShopRegistrationScreen2 = ({ route }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color="#00aaff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Shop registration</Text>
+        <Text style={styles.headerTitle}>Shop Registration (2/2)</Text>
       </View>
 
-      <Text style={styles.subTitle}>Please fill in your details to create your account</Text>
+      <Text style={styles.subTitle}>Select your shop location</Text>
 
       <View style={styles.inputContainer}>
-        <Text>Enter What you can display to user</Text>
-        <TextInput
-          style={[styles.input, { height: 150 }]}
-          value={displayInfo}
-          onChangeText={setDisplayInfo}
-          multiline={true}
-        />
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: 7.8731,
+            longitude: 80.7718,
+            latitudeDelta: 2.0,
+            longitudeDelta: 2.0,
+          }}
+          onPress={handleMapPress}
+        >
+          <Marker coordinate={location} draggable onDragEnd={handleMapPress} />
+        </MapView>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>REGISTER</Text>
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>SUBMIT</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -72,13 +103,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginBottom: 20,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+  map: {
+    height: 400, // Larger map for better usability
     borderRadius: 5,
-    padding: 10,
-    marginTop: 5,
-    backgroundColor: '#fff',
   },
   button: {
     backgroundColor: '#00aaff',

@@ -3,7 +3,8 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } fr
 import { useNavigation } from '@react-navigation/native';
 import { account } from '../../lib/appwrite';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Modal from 'react-native-modal'; // Import Modal for the pop-up
+import Modal from 'react-native-modal';
+
 
 import {
   fetchUserWaterConsumption,
@@ -31,52 +32,66 @@ const ProfileScreen = () => {
     profilePic: defaultProfilePic,
   });
 
-  const [isModalVisible, setModalVisible] = useState(false); // State for Modal visibility
+  const [isModalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const loadProfileData = async () => {
       try {
-        const waterConsumption = await fetchUserWaterConsumption();
-        const weight = await fetchUserWeight();
-        const age = await fetchUserAge();
-        const wakeUpTime = await fetchUserWakeUpTime();
-        const bedtime = await fetchUserBedtime();
-        const { email, phoneNumber, profilePic, username } = await fetchUserEmailAndPhone();
+        // Get the current user's account ID from AsyncStorage or Appwrite
+        const accountId = await AsyncStorage.getItem('accountId');
+        if (!accountId) {
+          throw new Error('No account ID found. Please log in again.');
+        }
+
+        // Fetch current user data from Appwrite to ensure session is valid
+        const currentUser = await account.get();
+        if (!currentUser) {
+          throw new Error('No active session found.');
+        }
+
+        // Fetch profile data using custom functions
+        const waterConsumption = await fetchUserWaterConsumption(accountId);
+        const weight = await fetchUserWeight(accountId);
+        const age = await fetchUserAge(accountId);
+        const wakeUpTime = await fetchUserWakeUpTime(accountId);
+        const bedtime = await fetchUserBedtime(accountId);
+        const { email, phoneNumber, profilePic, username } = await fetchUserEmailAndPhone(accountId);
 
         setProfile({
-          intakeGoal: `${waterConsumption} ml`,
-          weight: `${weight} kg`,
-          age: `${age}`,
-          email,
-          mobile: phoneNumber,
-          username,
-          wakeUpTime,
-          bedtime,
+          intakeGoal: `${waterConsumption || 0} ml`,
+          weight: `${weight || 'N/A'} kg`,
+          age: `${age || 'N/A'}`,
+          email: email || 'N/A',
+          mobile: phoneNumber || 'N/A',
+          username: username || currentUser.name || 'N/A',
+          wakeUpTime: wakeUpTime || 'N/A',
+          bedtime: bedtime || 'N/A',
           profilePic: profilePic || defaultProfilePic,
         });
       } catch (error) {
         console.error('Failed to load profile data:', error);
+        Alert.alert('Error', 'Failed to load profile data. Please log in again.');
+        navigation.navigate('Login'); // Redirect to login on failure
       }
     };
 
     loadProfileData();
-  }, []);
+  }, [navigation]);
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('userSession');
-      const currentUser = await account.get();
-      if (currentUser) {
-        await account.deleteSession('current');
-        Alert.alert('Success', 'Logged out successfully');
-        navigation.navigate('Login');
-      }
+      // Clear Appwrite session
+      await account.deleteSession('current');
+      // Clear AsyncStorage
+      await AsyncStorage.clear();
+      Alert.alert('Success', 'Logged out successfully');
+      navigation.navigate('Login');
     } catch (error) {
-      Alert.alert('Error', 'No active session to log out from.');
+      console.error('Logout error:', error);
+      Alert.alert('Error', 'Failed to log out. Please try again.');
     }
   };
 
-  // Toggle Modal visibility
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -91,12 +106,12 @@ const ProfileScreen = () => {
 
       <Modal
         isVisible={isModalVisible}
-        onBackdropPress={toggleModal} // Close modal when clicking outside
+        onBackdropPress={toggleModal}
         animationIn="fadeIn"
         animationOut="fadeOut"
-        backdropOpacity={0} // Removes the dimming effect
-        animationInTiming={200} // Faster animation in
-        animationOutTiming={200} // Faster animation out
+        backdropOpacity={0}
+        animationInTiming={200}
+        animationOutTiming={200}
         style={styles.modalStyle}
       >
         <View style={styles.modalContent}>
@@ -106,8 +121,14 @@ const ProfileScreen = () => {
           <TouchableOpacity onPress={() => { navigation.navigate('ShopRegistrationScreen1'); toggleModal(); }}>
             <Text style={styles.modalText}>Join with Us</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={toggleModal}>
+          <TouchableOpacity onPress={() => { navigation.navigate('ContactUsScreen'); toggleModal(); }}>
+            <Text style={styles.modalText}>Contact Us</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => { navigation.navigate('ChatScreen'); toggleModal(); }}>
+            <Text style={styles.modalText}>Aqua ring</Text>
+          </TouchableOpacity>
+          
         </View>
       </Modal>
 
@@ -122,13 +143,46 @@ const ProfileScreen = () => {
       </View>
 
       <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>💧 Intake Goal: {profile.intakeGoal}</Text>
-        <Text style={styles.infoText}>👤 Username: {profile.username}</Text>
-        <Text style={styles.infoText}>📧 Email: {profile.email}</Text>
-        <Text style={styles.infoText}>⚖️ Weight: {profile.weight}</Text>
-        <Text style={styles.infoText}>🎂 Age: {profile.age}</Text>
-        <Text style={styles.infoText}>⏰ Wake-up Time: {profile.wakeUpTime}</Text>
-        <Text style={styles.infoText}>🌙 Bedtime: {profile.bedtime}</Text>
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>💧 Intake Goal:</Text>
+          <Text style={styles.value}>{profile.intakeGoal}</Text>
+        </View>
+        <View style={styles.divider} />
+
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>👤 Username:</Text>
+          <Text style={styles.value}>{profile.username}</Text>
+        </View>
+        <View style={styles.divider} />
+
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>📧 Email:</Text>
+          <Text style={styles.value}>{profile.email}</Text>
+        </View>
+        <View style={styles.divider} />
+
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>⚖️ Weight:</Text>
+          <Text style={styles.value}>{profile.weight}</Text>
+        </View>
+        <View style={styles.divider} />
+
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>🎂 Age:</Text>
+          <Text style={styles.value}>{profile.age}</Text>
+        </View>
+        <View style={styles.divider} />
+
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>⏰ Wake-up Time:</Text>
+          <Text style={styles.value}>{profile.wakeUpTime}</Text>
+        </View>
+        <View style={styles.divider} />
+
+        <View style={styles.infoRow}>
+          <Text style={styles.label}>🌙 Bedtime:</Text>
+          <Text style={styles.value}>{profile.bedtime}</Text>
+        </View>
       </View>
 
       <View style={styles.logoutButtonContainer}>
@@ -143,7 +197,7 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 20, // Ensure content has padding to prevent cutting off
+    paddingBottom: 20,
     backgroundColor: '#f7f7f7',
     padding: 20,
   },
@@ -156,19 +210,19 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   modalStyle: {
-    justifyContent: 'flex-start', // Aligns the modal at the top
-    alignItems: 'flex-end', // Aligns the modal to the right
-    margin: 0, // Removes default margin
-    paddingTop: 60, // Adds padding to position below the top bar
-    paddingRight: 20, // Align with the three dots button
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    margin: 0,
+    paddingTop: 60,
+    paddingRight: 20,
   },
   modalContent: {
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
-    shadowColor: 'transparent', // No shadow color
-    elevation: 0, // No elevation
-    width: 150, // Adjust width as per your design
+    shadowColor: 'transparent',
+    elevation: 0,
+    width: 150,
   },
   modalText: {
     fontSize: 18,
@@ -201,9 +255,27 @@ const styles = StyleSheet.create({
     elevation: 2,
     marginBottom: 20,
   },
-  infoText: {
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  label: {
     fontSize: 18,
-    marginBottom: 15,
+    color: '#333',
+    flex: 1,
+  },
+  value: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'right',
+    flex: 1,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#d3d3d3',
+    marginVertical: 10,
   },
   logoutButtonContainer: {
     padding: 20,
@@ -211,7 +283,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fff',
     elevation: 2,
-    marginBottom: 20, // Adds space at the bottom
+    marginBottom: 20,
   },
   logoutButton: {
     backgroundColor: '#ff4d4d',

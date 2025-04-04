@@ -17,16 +17,43 @@ const HealthWellness = () => {
       </View>
     
       <ScrollView style={styles.tipsContainer}>
-        <View style={styles.tip}>
-          <Text style={styles.tipText}>Make sure to balance water intake with meals to help the body absorb nutrients efficiently.</Text>
-        </View>
-        <View style={styles.tip}>
-          <Text style={styles.tipText}>Adequate hydration can improve skin elasticity and overall glow.</Text>
-        </View>
-        <View style={styles.tip}>
-          <Text style={styles.tipText}>Staying hydrated helps your body fight off illnesses by flushing out toxins.</Text>
-        </View>
-      </ScrollView>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Make sure to balance water intake with meals to help the body absorb nutrients efficiently.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Adequate hydration can improve skin elasticity and overall glow.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Staying hydrated helps your body fight off illnesses by flushing out toxins.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Drinking water boosts brain power and helps improve focus and concentration.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Hydration helps regulate body temperature, keeping you cool during hot weather.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Drinking water can aid in weight loss by promoting a feeling of fullness.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Staying hydrated supports healthy digestion and helps prevent constipation.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Drinking water before bed can reduce the likelihood of muscle cramps at night.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Proper hydration supports joint lubrication, reducing pain and stiffness.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Drinking water regularly can boost your energy levels and combat fatigue.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Infuse your water with fruits like berries or citrus for a flavorful, hydrating treat.</Text>
+          </View>
+          <View style={styles.tip}>
+            <Text style={styles.tipText}>Hydration can improve your mood and reduce stress levels throughout the day.</Text>
+          </View>
+        </ScrollView>
     </View>
   );
 };

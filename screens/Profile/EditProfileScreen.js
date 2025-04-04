@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, ScrollView } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { updateProfilePicture, updateUserWeight, updateUserAge, updateWakeUpTime, updateBedtime, updateUserEmailAndPhone } from '../../lib/appwrite';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons'; // Importing Ionicons for back button
 
 const EditProfileScreen = () => {
   const route = useRoute();
@@ -50,72 +51,133 @@ const EditProfileScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={selectImage}>
+    <ScrollView style={styles.container}>
+      {/* Header with Back Arrow and Title */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#00aaff" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Edit Profile</Text>
+      </View>
+
+      {/* Profile Image */}
+      <TouchableOpacity onPress={selectImage} style={styles.imageContainer}>
         <Image source={{ uri: profilePic }} style={styles.profileImage} />
         <Text style={styles.editText}>Tap to select image</Text>
       </TouchableOpacity>
 
-      {/* Form inputs for other profile details */}
-      <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
-      <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} />
-      <TextInput style={styles.input} placeholder="Weight" value={weight} onChangeText={setWeight} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder="Age" value={age} onChangeText={setAge} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder="Wake-up Time" value={wakeUpTime} onChangeText={setWakeUpTime} />
-      <TextInput style={styles.input} placeholder="Bedtime" value={bedtime} onChangeText={setBedtime} />
+      {/* Form Inputs in Card with Dividers */}
+      <View style={styles.cardContainer}>
+        {/* Name Field */}
+        <Text style={styles.label}>👤 Name</Text>
+        <TextInput style={styles.input} value={name} onChangeText={setName} />
+        <View style={styles.divider} />
 
+        {/* Email Field */}
+        <Text style={styles.label}>📧 Email</Text>
+        <TextInput style={styles.input} value={email} onChangeText={setEmail} />
+        <View style={styles.divider} />
+
+        {/* Weight Field */}
+        <Text style={styles.label}>⚖️ Weight (kg)</Text>
+        <TextInput style={styles.input} value={weight} onChangeText={setWeight} keyboardType="numeric" />
+        <View style={styles.divider} />
+
+        {/* Age Field */}
+        <Text style={styles.label}>🎂 Age</Text>
+        <TextInput style={styles.input} value={age} onChangeText={setAge} keyboardType="numeric" />
+        <View style={styles.divider} />
+
+        {/* Wake-up Time Field */}
+        <Text style={styles.label}>⏰ Wake-up Time</Text>
+        <TextInput style={styles.input} value={wakeUpTime} onChangeText={setWakeUpTime} />
+        <View style={styles.divider} />
+
+        {/* Bedtime Field */}
+        <Text style={styles.label}>🌙 Bedtime</Text>
+        <TextInput style={styles.input} value={bedtime} onChangeText={setBedtime} />
+      </View>
+
+      {/* Save Button */}
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
         <Text style={styles.saveButtonText}>Save Profile</Text>
       </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#f7f7f7',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center', // Center the title
+    paddingTop:0, // Ensure it is at the top
+  },
+  backButton: {
+    position: 'absolute',
+    left: 0,
+    paddingLeft: 10,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#00aaff',
+  },
+  imageContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
   },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
     marginBottom: 10,
+    marginTop:30,
   },
   editText: {
     fontSize: 16,
+    color: '#666',
+  },
+  cardContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    elevation: 2,
     marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
-    width: '80%',
+    fontSize: 16,
+    color: '#333',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#d3d3d3', // Ash color for divider
     marginVertical: 10,
   },
   saveButton: {
     backgroundColor: '#00aaff',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
     borderRadius: 5,
-    marginTop: 20,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom:60,
   },
   saveButtonText: {
     color: '#fff',
-    fontSize: 16,
-  },
-  backButton: {
-    marginTop: 20,
-  },
-  backButtonText: {
-    color: '#00aaff',
     fontSize: 16,
   },
 });
